@@ -2,7 +2,9 @@ import disnake
 from disnake.ext import commands
 import random
 import collections
-# from economy import balances
+import sqlite3
+
+con = sqlite3.connect('../db/database.db')
 
 deck = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]*4
 players = {} # player id : player & dealer deck
