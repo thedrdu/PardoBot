@@ -54,7 +54,6 @@ async def on_message(message: disnake.Message):
     if message.author.bot:
         return
     if message.content.lower() == "nya":
-        # print("attempting to message")
         await message.author.send("Nya!")
 
 

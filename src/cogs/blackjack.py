@@ -1,4 +1,3 @@
-from turtle import update
 import disnake
 from disnake.ext import commands
 import random
