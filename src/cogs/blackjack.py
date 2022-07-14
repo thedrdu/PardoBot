@@ -95,7 +95,8 @@ def hit(hand):
     '''
     Appends one random card to the hand.
     '''
-    card = deck.pop()
+    random.shuffle(deck)
+    card = deck[0]
     if card == 11:
         card = "J"
     if card == 12:
