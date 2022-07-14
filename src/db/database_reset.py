@@ -5,3 +5,6 @@ print("Successful connection to database.")
 cur = con.cursor()
 
 cur.execute('''DROP TABLE blackjack;''')
+cur.execute('''DROP TABLE genshin;''')
+con.commit()
+con.close()

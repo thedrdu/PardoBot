@@ -2,41 +2,28 @@ import disnake
 from disnake.ext import commands
 import random
 import collections
-
-
-balances = {} # player id : balance
+import sqlite3
+import os
+from dotenv import load_dotenv
+from data.economy_util import update_balance, get_balance
+DB_PATH = os.getenv('DB_PATH')
 
 def custom_cooldown(message):
     return commands.Cooldown(1, 10)  # 1 per 10 secs
 
-class BlackjackCommand(commands.Cog):
-    # Note that we're using self as the first argument, since the command function is inside a class.
+class EconomyCommand(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-    
-    
+        
     @commands.slash_command(
         name="bal",
-        description="Checks user balance.",
+        description="Returns user balance.",
     )
+    # @commands.dynamic_cooldown(custom_cooldown, commands.BucketType.user)
     async def bal(self, inter: disnake.ApplicationCommandInteraction):
-        global balances
-        if inter.author.id not in balances.keys():
-            balances[inter.author.id] = 100
-        await inter.send(content=balances[inter.author.id], ephemeral=True)
-    
-    
-    @commands.slash_command(
-        name="work",
-        description="Earn 100 currency.",
-    )
-    @commands.dynamic_cooldown(custom_cooldown, commands.BucketType.user)
-    async def work(self, inter: disnake.ApplicationCommandInteraction):
-        global balances
-        if inter.author.id not in balances.keys():
-            balances[inter.author.id] = 100
-        balances[inter.author.id] += 100
-        await inter.response.send_message(embed=disnake.Embed(description=f"You earned 100 currency!"),ephemeral=True)
-    
+        bal = get_balance(inter.author.id)
+        # embed = disnake.Embed(description=)
+        await inter.response.send_message(content=f"Balance: {bal}")
+       
 def setup(bot: commands.Bot):
-    bot.add_cog(BlackjackCommand(bot))
+    bot.add_cog(EconomyCommand(bot))

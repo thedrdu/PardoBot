@@ -2,6 +2,10 @@ import disnake
 from disnake.ext import commands
 import random
 from datetime import datetime
+import collections
+import sqlite3
+import os
+from dotenv import load_dotenv
 
 players = {}
 instances = {} #user id and message id
@@ -162,16 +166,6 @@ class GenshinCommand(commands.Cog):
         global instances
         now = datetime.now()
         creation_time = now.strftime("%H:%M:%S")
-        # if inter.author.id in instances.keys():
-            
-        #     embed = disnake.Embed(
-        #         title="Genshin Wishing Simulator",
-        #         description="You already have an instance open!"
-        #     )
-        #     embed.set_thumbnail(f"{inter.author.avatar}")
-        #     embed.set_author(name=f"{inter.author}", icon_url=f"{inter.author.display_avatar.url}")
-        #     await inter.response.send_message(embed=embed, ephemeral=True)
-        #     return
         
         players[inter.author.id] = []
         players[inter.author.id].append(0) #pity5

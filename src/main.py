@@ -46,7 +46,7 @@ bot.load_extension("cogs.button") # Note: We did not append the .py extension.
 bot.load_extension("cogs.genshin")
 bot.load_extension("cogs.moderation")
 bot.load_extension("cogs.blackjack")
-# bot.load_extension("cogs.economy")
+bot.load_extension("cogs.economy")
 
 '''Passive Commands'''
 @bot.listen()
@@ -66,8 +66,6 @@ async def on_message(message: disnake.Message):
 )
 async def diceroll(inter: disnake.ApplicationCommandInteraction):
     await inter.response.send_message(content=str(random.randint(1,6)))
-    # await asyncio.sleep(2)
-
 
 @bot.slash_command(
     name="pardopog",
