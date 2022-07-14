@@ -20,7 +20,7 @@ cur.execute('''CREATE TABLE blackjack
 
 cur.execute('''CREATE TABLE economy
                (ID INTEGER PRIMARY KEY,
-               USER_ID INT NOT NULL TYPE UNIQUE, 
+               USER_ID INT NOT NULL, 
                BALANCE INT DEFAULT 0);''')
 
 con.commit()
