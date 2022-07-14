@@ -183,7 +183,7 @@ class BlackjackCommand(commands.Cog):
                 description = "Player loses..."
                 update_balance(inter.author.id, bet*-1)
             embed = disnake.Embed(
-                title=f"",
+                title=f"Bet: {bet}",
                 description=description
             )
             embed.add_field(
@@ -239,7 +239,6 @@ class BlackjackCommand(commands.Cog):
         id_parts = inter.component.custom_id.split('~')
         button_id = id_parts[1]
         global deck
-        global GRAYED_COMPS
         if button_id == "blackjackhit": #Requires game id
             author_id = int(id_parts[2])
             if inter.author.id == author_id: #Verify author
@@ -306,6 +305,7 @@ class BlackjackCommand(commands.Cog):
             author_id = int(id_parts[0])
             if inter.author.id == author_id: #Verify author
                 game_id = id_parts[0]
+                await inter.response.defer()
                 await inter.delete_original_message()
                 finish(game_id)
                 return
