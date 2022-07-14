@@ -1,5 +1,3 @@
-from cgitb import text
-from turtle import title
 import disnake
 from disnake.ext import commands
 import random
