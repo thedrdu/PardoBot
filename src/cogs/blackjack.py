@@ -4,11 +4,13 @@ import random
 import collections
 import sqlite3
 import os
+from dotenv import load_dotenv
+BLACKJACK_DB_PATH = os.getenv('BLACKJACK_DB_PATH')
 
 deck = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]*4
 
 def finish(game_id):
-    con = sqlite3.connect("sqlite:///../db/database.db")
+    con = sqlite3.connect(f"{BLACKJACK_DB_PATH}")
     cur = con.cursor()
     cur.execute(f'''UPDATE blackjack SET GAME_STATE = 0 WHERE GAME_ID={game_id};''')
     con.commit()
@@ -18,7 +20,7 @@ def convert_string(hand):
     return ','.join([str(elem) for elem in hand])
 
 def update_hands(game_id, player_hand_string, dealer_hand_string):
-    con = sqlite3.connect("sqlite:///../db/database.db")
+    con = sqlite3.connect(f"{BLACKJACK_DB_PATH}")
     cur = con.cursor()
     print(f"setting to {player_hand_string}")
     cur.execute(f'''UPDATE blackjack SET PLAYER_CARDS=?, DEALER_CARDS=? WHERE GAME_ID={game_id};''',(f"{player_hand_string}",f"{dealer_hand_string}"))
@@ -29,7 +31,7 @@ def get_hands(game_id):
     '''
     Retrieves data from database, converts to array.
     '''
-    con = sqlite3.connect("sqlite:///../db/database.db")
+    con = sqlite3.connect(f"{BLACKJACK_DB_PATH}")
     cur = con.cursor()
     player_cards_string = cur.execute(f'''SELECT PLAYER_CARDS FROM blackjack WHERE GAME_ID={game_id};''')
     player_cards = player_cards_string.fetchone()[0].split(",")
@@ -181,7 +183,8 @@ class BlackjackCommand(commands.Cog):
         )
         embed.set_author(name=inter.author, icon_url=inter.author.display_avatar.url)
         
-        con = sqlite3.connect("sqlite:///../db/database.db")
+        print(BLACKJACK_DB_PATH)
+        con = sqlite3.connect(f"{BLACKJACK_DB_PATH}")
         print("---------------CONNECTED---------------")
         cur = con.cursor()
         cur.execute(f'''INSERT INTO blackjack (PLAYER_ID,PLAYER_CARDS,DEALER_CARDS) 
