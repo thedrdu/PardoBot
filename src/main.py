@@ -40,9 +40,7 @@ async def on_ready():
     await online()
     await bot.change_presence(status=disnake.Status.streaming, activity=game)
     
-bot.load_extension("cogs.say")  # Note: We did not append the .py extension.
 bot.load_extension("cogs.util")  # Note: We did not append the .py extension.
-bot.load_extension("cogs.button") # Note: We did not append the .py extension.
 bot.load_extension("cogs.genshin")
 bot.load_extension("cogs.moderation")
 bot.load_extension("cogs.blackjack")
@@ -58,14 +56,6 @@ async def on_message(message: disnake.Message):
 
 
 '''Slash Commands'''
-
-@bot.slash_command(
-    name="diceroll",
-    description="Returns a value between 1 and 6."
-    # guild_ids=[1234, 5678]
-)
-async def diceroll(inter: disnake.ApplicationCommandInteraction):
-    await inter.response.send_message(content=str(random.randint(1,6)))
 
 @bot.slash_command(
     name="pardopog",

@@ -267,7 +267,7 @@ class BlackjackCommand(commands.Cog):
                     embed = get_final_embed(inter, player_hand, dealer_hand, bet)
                     grayed_comps = get_grayed_comps(inter)
                     await inter.response.edit_message(embed=embed, components=grayed_comps)
-                    update_balance(inter.author.id, bet)
+                    update_balance(inter.author.id, bet*-1)
                     finish(game_id)
                     return
                 embed.set_author(name=inter.author, icon_url=inter.author.display_avatar.url)
