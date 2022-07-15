@@ -265,6 +265,7 @@ class BlackjackCommand(commands.Cog):
                 )
                 if total(player_hand) > 21:
                     embed = get_final_embed(inter, player_hand, dealer_hand, bet)
+                    embed.description=f"Player loses..."
                     grayed_comps = get_grayed_comps(inter)
                     await inter.response.edit_message(embed=embed, components=grayed_comps)
                     update_balance(inter.author.id, bet*-1)

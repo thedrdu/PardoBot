@@ -46,10 +46,12 @@ class EconomyCommand(commands.Cog):
         embed.set_author(name=inter.author, icon_url=inter.author.display_avatar.url)
         await inter.response.send_message(embed=embed, ephemeral=True)
     
-    # @work.error
-    # @commands.CommandOnCooldown()
-    # async def work_error(self, inter: disnake.ApplicationCommandInteraction):
-    #     return
+    @work.error
+    async def work_error(self, inter: disnake.ApplicationCommandInteraction, error):
+        if isinstance(error, commands.CommandOnCooldown):
+            embed = disnake.Embed(description=f"Too soon! Please wait {round(error.cooldown.get_retry_after())} seconds!")
+            embed.set_author(name=inter.author, icon_url=inter.author.display_avatar.url)
+            await inter.response.send_message(embed=embed, ephemeral=True)
         
        
 def setup(bot: commands.Bot):
