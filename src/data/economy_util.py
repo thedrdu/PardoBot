@@ -78,7 +78,7 @@ def get_server_rank(user_id, guild):
     print(row_count)
     return row_count+1
 
-def get_local_leaderboard(guild):
+def get_guild_leaderboard(guild):
     '''
     Gets the server leaderboard embed for user balances.
     '''
@@ -91,6 +91,29 @@ def get_local_leaderboard(guild):
         top20[user[0]] = user[1]
 
     embed = disnake.Embed(title=f"Leaderboard for {guild.name}")
+    user_string = ""
+    for i,user in enumerate(top20.keys()):
+        user_string += f"{i+1}. <@{user}>\n"
+    balance_string = ""
+    for balance in top20.values():
+        balance_string += f"{balance}\n"
+    embed.add_field(name=f"User",value=user_string)
+    embed.add_field(name=f"Balance",value=balance_string)
+    
+    return embed
+
+def get_global_leaderboard():
+    '''
+    Gets the global leaderboard embed for user balances.
+    '''
+    top20 = {}
+    con = sqlite3.connect(f"{DB_PATH}")
+    cur = con.cursor()
+    for user in cur.execute(f'''SELECT USER_ID,BALANCE FROM economy 
+                            ORDER BY BALANCE DESC LIMIT 20;'''):
+        top20[user[0]] = user[1]
+
+    embed = disnake.Embed(title=f"Global Leaderboard")
     user_string = ""
     for i,user in enumerate(top20.keys()):
         user_string += f"{i+1}. <@{user}>\n"
