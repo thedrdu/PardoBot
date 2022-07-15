@@ -56,6 +56,20 @@ class EconomyCommand(commands.Cog):
         await inter.response.send_message(embed=embed)
         
     @commands.slash_command(
+        name="pay",
+        description="Takes from user balance to pay a target user.",
+    )
+    async def pay(self, inter: disnake.ApplicationCommandInteraction, target_user: disnake.Member, amount: int):
+        player_balance = get_balance(inter.author.id)
+        if(amount > player_balance):
+            await inter.response.send_message(f"Insufficient balance!", ephemeral=True)
+            return
+        update_balance(inter.author.id, amount*-1)
+        update_balance(target_user.id, amount)
+        embed = disnake.Embed(description=f"{inter.author.mention} paid {target_user.mention} $**{amount}**!")
+        await inter.response.send_message(embed=embed)
+        
+    @commands.slash_command(
         name="work",
         description="Increases user balance.",
     )

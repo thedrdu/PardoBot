@@ -62,14 +62,10 @@ def deal():
     for i in range(2):
         random.shuffle(deck)
         card = deck[0]
-        if card == 11:
-            card = "J"
-        if card == 12:
-            card = "Q"
-        if card == 13:
-            card = "K"
-        if card == 14:
-            card = "A"
+        if card == 11: card = "J"
+        if card == 12: card = "Q"
+        if card == 13: card = "K"
+        if card == 14: card = "A"
         hand.append(card)
     return hand
 
@@ -97,14 +93,10 @@ def hit(hand):
     '''
     random.shuffle(deck)
     card = deck[0]
-    if card == 11:
-        card = "J"
-    if card == 12:
-        card = "Q"
-    if card == 13:
-        card = "K"
-    if card == 14:
-        card = "A"
+    if card == 11: card = "J"
+    if card == 12: card = "Q"
+    if card == 13: card = "K"
+    if card == 14: card = "A"
     hand.append(card)
     return hand
 
