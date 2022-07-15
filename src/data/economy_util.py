@@ -21,7 +21,6 @@ def update_balance(user_id, amount):
     con = sqlite3.connect(f"{DB_PATH}")
     cur = con.cursor()
     row = cur.execute(f'''SELECT BALANCE FROM economy WHERE USER_ID={user_id};''')
-    # Find way to handle if user does not have a current entry
     current_balance = row.fetchone()
     if current_balance is None:
         con.commit()
@@ -64,19 +63,6 @@ def get_global_rank(user_id):
     print(row_count)
     return row_count+1
 
-def get_global_rank(user_id):
-    '''
-    Checks the number of people with balances higher than the target user globally, then adds 1(since rankings are not 0-indexed)
-    '''
-    con = sqlite3.connect(f"{DB_PATH}")
-    cur = con.cursor()
-    rows = cur.execute(f'''SELECT count(*) FROM economy WHERE balance > (SELECT balance FROM economy WHERE user_id={user_id});''')
-    row_count = rows.fetchone()[0]
-    con.commit()
-    con.close()
-    print(row_count)
-    return row_count+1
-
 def get_server_rank(user_id, guild):
     '''
     Checks the number of people with balances higher than the target user in the server, then adds 1(since rankings are not 0-indexed)
@@ -91,3 +77,29 @@ def get_server_rank(user_id, guild):
     con.close()
     print(row_count)
     return row_count+1
+
+def get_local_leaderboard(guild):
+    '''
+    Gets the server leaderboard embed for user balances.
+    '''
+    top20 = {}
+    member_list_string = ','.join([str(elem.id) for elem in guild.members])
+    con = sqlite3.connect(f"{DB_PATH}")
+    cur = con.cursor()
+    for user in cur.execute(f'''SELECT USER_ID,BALANCE FROM economy WHERE USER_ID IN ({member_list_string}) 
+                            ORDER BY BALANCE DESC LIMIT 20;'''):
+        top20[user[0]] = user[1]
+
+    embed = disnake.Embed(title=f"Leaderboard for {guild.name}")
+    user_string = ""
+    for i,user in enumerate(top20.keys()):
+        user_string += f"{i+1}. <@{user}>\n"
+    balance_string = ""
+    for balance in top20.values():
+        balance_string += f"{balance}\n"
+    embed.add_field(name=f"User",value=user_string)
+    embed.add_field(name=f"Balance",value=balance_string)
+    
+    return embed
+        
+    # figure out how to get the top 20

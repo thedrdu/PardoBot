@@ -6,31 +6,49 @@ import sqlite3
 import os
 from datetime import datetime
 from dotenv import load_dotenv
-from data.economy_util import update_balance, get_balance, get_global_rank, get_server_rank
+from data.economy_util import update_balance, get_balance, get_global_rank, get_server_rank, get_local_leaderboard
 DB_PATH = os.getenv('DB_PATH')
 
 def custom_cooldown(message):
     return commands.Cooldown(1, 10)  # 1 per 10 secs
+
+
 
 class EconomyCommand(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         
     @commands.slash_command(
+        name="leaderboard",
+        description="Returns leaderboard of user balances.",
+    )
+    # @commands.dynamic_cooldown(custom_cooldown, commands.BucketType.user)
+    async def leaderboard(self, inter: disnake.ApplicationCommandInteraction):
+        now = datetime.now()
+        current_time = now.strftime("%H:%M:%S") 
+        embed = get_local_leaderboard(inter.guild)
+        embed.set_author(name=inter.author, icon_url=inter.author.display_avatar.url)
+        embed.set_footer(text=f"Data retrieved in {round(inter.bot.latency * 1000)}ms at {current_time}")
+        await inter.response.send_message(embed=embed,allowed_mentions=disnake.AllowedMentions.none())   
+        
+        
+    @commands.slash_command(
         name="bal",
         description="Returns user balance.",
     )
     # @commands.dynamic_cooldown(custom_cooldown, commands.BucketType.user)
-    async def bal(self, inter: disnake.ApplicationCommandInteraction):
+    async def bal(self, inter: disnake.ApplicationCommandInteraction, user: disnake.Member = None):
+        if user is None:
+            user = inter.author
         now = datetime.now()
         current_time = now.strftime("%H:%M:%S")
-        bal = get_balance(inter.author.id)
-        global_rank = get_global_rank(inter.author.id)
-        server_rank = get_server_rank(inter.author.id, inter.guild)
+        bal = get_balance(user.id)
+        global_rank = get_global_rank(user.id)
+        server_rank = get_server_rank(user.id, inter.guild)
         embed = disnake.Embed(description=f"Global Rank: #**{global_rank}**\nServer Rank: #**{server_rank}**")
         embed.add_field(name=f"Balance",value=f"{bal}")
-        embed.set_author(name=inter.author, icon_url=inter.author.display_avatar.url)
-        embed.set_thumbnail(inter.author.avatar)
+        embed.set_author(name=user, icon_url=user.display_avatar.url)
+        embed.set_thumbnail(user.avatar)
         embed.set_footer(text=f"Data retrieved in {round(inter.bot.latency * 1000)}ms at {current_time}")
         await inter.response.send_message(embed=embed)
         

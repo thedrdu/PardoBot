@@ -180,7 +180,7 @@ class UtilCommand(commands.Cog):
             title=f"Most Common Words Per User",
             colour=0xF0C43F,
         )
-        embed.set_footer(text=f"Data retrieved from past {message_limit} messages at {current_time}")
+        embed.set_footer(text=f"Data retrieved from past {message_limit} messages at {current_time} EST")
         await inter.edit_original_message(embed=embed, allowed_mentions=disnake.AllowedMentions.none())
             
     

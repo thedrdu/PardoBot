@@ -23,5 +23,10 @@ cur.execute('''CREATE TABLE economy
                USER_ID INT NOT NULL, 
                BALANCE INT DEFAULT 0);''')
 
+#FIGURE THIS OUT 
+cur.execute('''CREATE TABLE coinflip
+               (GAME_ID INTEGER PRIMARY KEY,
+               USER_ID INT NOT NULL);''')
+
 con.commit()
 con.close()
