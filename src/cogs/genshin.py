@@ -157,44 +157,6 @@ def wish(amount, pity5, pity4):
 class GenshinCommand(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        
-    @commands.slash_command()
-    async def inventory(self, inter: disnake.ApplicationCommandInteraction):
-        dict5 = {}
-        dict4 = {}
-        dict3 = {}
-        pulls = get_pulls(inter.author.id)
-        for item in pulls:
-            if item in _5Stars.keys():
-                if item in dict5.keys():
-                    dict5[item] += 1
-                else:
-                    dict5[item] = 1
-            elif item in _4Stars.keys():
-                if item in dict4.keys():
-                    dict4[item] += 1
-                else:
-                    dict4[item] = 1
-            else:
-                if item in dict3.keys():
-                    dict3[item] += 1
-                else:
-                    dict3[item] = 1
-        embed = disnake.Embed(
-            title=f"{inter.author.name}'s Inventory"
-        )
-        value = ""
-        for item in dict5:
-            value += f"(**{dict5[item]}**) {_5Stars[item]}{item} \n"
-        value += "\n"
-        for item in dict4:
-            value += f"(**{dict4[item]}**) {_4Stars[item]}{item} \n"
-        value += "\n"
-        for item in dict3:
-            value += f"(**{dict3[item]}**) {item} \n"
-        embed.description = value
-        comps = [disnake.ui.Button(label="Quit", style=disnake.ButtonStyle.red, custom_id=f"{inter.author.id}~quitinventory")]
-        await inter.response.send_message(embed=embed,components=comps)
 
     @commands.slash_command()
     async def wish(self, inter: disnake.ApplicationCommandInteraction):
@@ -205,6 +167,7 @@ class GenshinCommand(commands.Cog):
             disnake.ui.Button(label="Wish", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~wish"),
             disnake.ui.Button(label="Wish x10", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~wish10"),
             disnake.ui.Button(label="Reset Embed", style=disnake.ButtonStyle.gray, custom_id=f"{inter.author.id}~resetwish"),
+            disnake.ui.Button(label="Inventory", style=disnake.ButtonStyle.green, custom_id=f"{inter.author.id}~inventorywish"),
             disnake.ui.Button(label="Quit", style=disnake.ButtonStyle.red, custom_id=f"{inter.author.id}~quitwish")
         ]
         embed = disnake.Embed(
@@ -258,6 +221,7 @@ class GenshinCommand(commands.Cog):
                     disnake.ui.Button(label="Wish", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~wish"),
                     disnake.ui.Button(label="Wish x10", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~wish10"),
                     disnake.ui.Button(label="Reset Embed", style=disnake.ButtonStyle.gray, custom_id=f"{inter.author.id}~resetwish"),
+                    disnake.ui.Button(label="Inventory", style=disnake.ButtonStyle.green, custom_id=f"{inter.author.id}~inventorywish"),
                     disnake.ui.Button(label="Quit", style=disnake.ButtonStyle.red, custom_id=f"{inter.author.id}~quitwish")
                 ]
                 embed = disnake.Embed(
@@ -301,6 +265,7 @@ class GenshinCommand(commands.Cog):
                     disnake.ui.Button(label="Wish", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~wish"),
                     disnake.ui.Button(label="Wish x10", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~wish10"),
                     disnake.ui.Button(label="Reset Embed", style=disnake.ButtonStyle.gray, custom_id=f"{inter.author.id}~resetwish"),
+                    disnake.ui.Button(label="Inventory", style=disnake.ButtonStyle.green, custom_id=f"{inter.author.id}~inventorywish"),
                     disnake.ui.Button(label="Quit", style=disnake.ButtonStyle.red, custom_id=f"{inter.author.id}~quitwish")
                 ]
                 embed = disnake.Embed(
@@ -317,6 +282,7 @@ class GenshinCommand(commands.Cog):
                     disnake.ui.Button(label="Wish", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~wish"),
                     disnake.ui.Button(label="Wish x10", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~wish10"),
                     disnake.ui.Button(label="Reset Embed", style=disnake.ButtonStyle.gray, custom_id=f"{inter.author.id}~resetwish"),
+                    disnake.ui.Button(label="Inventory", style=disnake.ButtonStyle.green, custom_id=f"{inter.author.id}~inventorywish"),
                     disnake.ui.Button(label="Quit", style=disnake.ButtonStyle.red, custom_id=f"{inter.author.id}~quitwish")
                 ]
                 embed = disnake.Embed(
@@ -330,10 +296,50 @@ class GenshinCommand(commands.Cog):
             if author_id == inter.author.id:
                 await inter.response.defer()
                 await inter.delete_original_message()
-        if button_id == "quitinventory":
+        if button_id == "inventorywish":
             if author_id == inter.author.id:
                 await inter.response.defer()
-                await inter.delete_original_message()
+                dict5 = {}
+                dict4 = {}
+                dict3 = {}
+                pulls = get_pulls(inter.author.id)
+                for item in pulls:
+                    if item in _5Stars.keys():
+                        if item in dict5.keys():
+                            dict5[item] += 1
+                        else:
+                            dict5[item] = 1
+                    elif item in _4Stars.keys():
+                        if item in dict4.keys():
+                            dict4[item] += 1
+                        else:
+                            dict4[item] = 1
+                    else:
+                        if item in dict3.keys():
+                            dict3[item] += 1
+                        else:
+                            dict3[item] = 1
+                embed = disnake.Embed(
+                    title=f"{inter.author.name}'s Inventory"
+                )
+                value = ""
+                for item in dict5:
+                    value += f"(**{dict5[item]}**) {_5Stars[item]}{item} \n"
+                value += "\n"
+                for item in dict4:
+                    value += f"(**{dict4[item]}**) {_4Stars[item]}{item} \n"
+                value += "\n"
+                for item in dict3:
+                    value += f"(**{dict3[item]}**) {item} \n"
+                embed.description = value
+                comps = [
+                    disnake.ui.Button(label="Wish", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~wish"),
+                    disnake.ui.Button(label="Wish x10", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~wish10"),
+                    disnake.ui.Button(label="Reset Embed", style=disnake.ButtonStyle.gray, custom_id=f"{inter.author.id}~resetwish"),
+                    disnake.ui.Button(label="Inventory", style=disnake.ButtonStyle.green, custom_id=f"{inter.author.id}~inventorywish"),
+                    disnake.ui.Button(label="Quit", style=disnake.ButtonStyle.red, custom_id=f"{inter.author.id}~quitwish")
+                ]
+                await inter.edit_original_message(embed=embed,components=comps)
 
 def setup(bot: commands.Bot):
     bot.add_cog(GenshinCommand(bot))
