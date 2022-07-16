@@ -12,6 +12,11 @@ DB_PATH = os.getenv('DB_PATH')
 def custom_cooldown(message):
     return commands.Cooldown(1, 10)  # 1 per 10 secs
 
+def time_footer(inter):
+    now = datetime.now()
+    current_time = now.strftime("%H:%M:%S")
+    return f"Data retrieved in {round(inter.bot.latency * 1000)}ms at {current_time}"
+
 class EconomyCommand(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -27,11 +32,9 @@ class EconomyCommand(commands.Cog):
             disnake.ui.Button(label="Global", style=disnake.ButtonStyle.green, custom_id=f"{inter.author.id}~globalleaderboard"),
             disnake.ui.Button(label="Quit", style=disnake.ButtonStyle.red, custom_id=f"{inter.author.id}~quitleaderboard"),
         ]
-        now = datetime.now()
-        current_time = now.strftime("%H:%M:%S") 
         embed = get_guild_leaderboard(inter.guild)
         embed.set_author(name=inter.author, icon_url=inter.author.display_avatar.url)
-        embed.set_footer(text=f"Data retrieved in {round(inter.bot.latency * 1000)}ms at {current_time}")
+        embed.set_footer(text=time_footer(inter))
         await inter.response.send_message(embed=embed,components=comps,allowed_mentions=disnake.AllowedMentions.none())   
         
         
@@ -49,10 +52,10 @@ class EconomyCommand(commands.Cog):
         global_rank = get_global_rank(user.id)
         server_rank = get_server_rank(user.id, inter.guild)
         embed = disnake.Embed(description=f"Global Rank: #**{global_rank}**\nServer Rank: #**{server_rank}**")
-        embed.add_field(name=f"Balance",value=f"{bal}")
+        embed.add_field(name=f"Balance",value=f"<:HonkaiCoin:997742624477818921> {bal}")
         embed.set_author(name=user, icon_url=user.display_avatar.url)
         embed.set_thumbnail(user.avatar)
-        embed.set_footer(text=f"Data retrieved in {round(inter.bot.latency * 1000)}ms at {current_time}")
+        embed.set_footer(text=time_footer(inter))
         await inter.response.send_message(embed=embed)
         
     @commands.slash_command(
@@ -66,7 +69,8 @@ class EconomyCommand(commands.Cog):
             return
         update_balance(inter.author.id, amount*-1)
         update_balance(target_user.id, amount)
-        embed = disnake.Embed(description=f"{inter.author.mention} paid {target_user.mention} $**{amount}**!")
+        embed = disnake.Embed(description=f"{inter.author.mention} paid {target_user.mention} <:HonkaiCoin:997742624477818921> **{amount}**")
+        embed.set_footer(text=time_footer(inter))
         await inter.response.send_message(embed=embed)
         
     @commands.slash_command(
@@ -77,8 +81,9 @@ class EconomyCommand(commands.Cog):
     async def work(self, inter: disnake.ApplicationCommandInteraction):
         work_amount = random.randint(200,400)
         update_balance(inter.author.id, work_amount)
-        embed = disnake.Embed(description=f"Gained {work_amount}!")
+        embed = disnake.Embed(description=f"Earned <:HonkaiCoin:997742624477818921> {work_amount}")
         embed.set_author(name=inter.author, icon_url=inter.author.display_avatar.url)
+        embed.set_footer(text=time_footer(inter))
         await inter.response.send_message(embed=embed, ephemeral=True)
     
     @work.error
@@ -86,6 +91,7 @@ class EconomyCommand(commands.Cog):
         if isinstance(error, commands.CommandOnCooldown):
             embed = disnake.Embed(description=f"Too soon! Please wait {round(error.cooldown.get_retry_after())} seconds!")
             embed.set_author(name=inter.author, icon_url=inter.author.display_avatar.url)
+            embed.set_footer(text=time_footer(inter))
             await inter.response.send_message(embed=embed, ephemeral=True)
     
     @commands.Cog.listener()
@@ -99,7 +105,7 @@ class EconomyCommand(commands.Cog):
                 current_time = now.strftime("%H:%M:%S") 
                 embed = get_guild_leaderboard(inter.guild)
                 embed.set_author(name=inter.author, icon_url=inter.author.display_avatar.url)
-                embed.set_footer(text=f"Data retrieved in {round(inter.bot.latency * 1000)}ms at {current_time}")
+                embed.set_footer(text=time_footer(inter))
                 await inter.response.edit_message(embed=embed)
         if button_id == "globalleaderboard":
             author_id = int(id_parts[0])
@@ -108,7 +114,7 @@ class EconomyCommand(commands.Cog):
                 current_time = now.strftime("%H:%M:%S") 
                 embed = get_global_leaderboard()
                 embed.set_author(name=inter.author, icon_url=inter.author.display_avatar.url)
-                embed.set_footer(text=f"Data retrieved in {round(inter.bot.latency * 1000)}ms at {current_time}")
+                embed.set_footer(text=time_footer(inter))
                 await inter.response.edit_message(embed=embed)
         if button_id == "quitleaderboard":
             author_id = int(id_parts[0])

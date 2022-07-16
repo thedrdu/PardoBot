@@ -24,14 +24,13 @@ intents.emojis_and_stickers = True
 bot = commands.Bot(
     sync_commands_debug=False,
     intents=intents,
-    #test_guilds=[123456789, 987654321]
 )
 
 @bot.event
 async def online():
     channel = bot.get_channel(992809780143988808) #hard-coded
     current_time = datetime.now().strftime("%H:%M:%S")
-    await channel.send(f"PardoBot is online! [Time: {current_time} EST]")
+    await channel.send(f"PardoBot is online! [Time: {current_time}]")
 
 @bot.event
 async def on_ready():
@@ -40,7 +39,7 @@ async def on_ready():
     await online()
     await bot.change_presence(status=disnake.Status.streaming, activity=game)
     
-bot.load_extension("cogs.util")  # Note: We did not append the .py extension.
+bot.load_extension("cogs.util")
 bot.load_extension("cogs.genshin")
 bot.load_extension("cogs.moderation")
 bot.load_extension("cogs.blackjack")
@@ -55,13 +54,11 @@ async def on_message(message: disnake.Message):
     if message.content.lower() == "nya":
         await message.author.send("Nya!")
 
-
 '''Slash Commands'''
 
 @bot.slash_command(
     name="pardopog",
     description="Returns PardoPOG."
-    # guild_ids=[1234, 5678]
 )
 async def pardopog(inter: disnake.ApplicationCommandInteraction):
     f = disnake.File("./PardoPOG.png") #NOTE: This is a local file
@@ -71,7 +68,6 @@ async def pardopog(inter: disnake.ApplicationCommandInteraction):
     name="hug",
     description="Hugs a user.",
     guild_only=True,
-    # guild_ids=[1234, 5678]
 )
 async def hug(inter: disnake.ApplicationCommandInteraction, user: disnake.User):
     f = disnake.File("./hug.gif") #NOTE: This is a local file

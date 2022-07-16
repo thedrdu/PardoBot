@@ -96,7 +96,7 @@ def get_guild_leaderboard(guild):
         user_string += f"{i+1}. <@{user}>\n"
     balance_string = ""
     for balance in top20.values():
-        balance_string += f"{balance}\n"
+        balance_string += f"<:HonkaiCoin:997742624477818921> {balance}\n"
     embed.add_field(name=f"User",value=user_string)
     embed.add_field(name=f"Balance",value=balance_string)
     
@@ -119,7 +119,7 @@ def get_global_leaderboard():
         user_string += f"{i+1}. <@{user}>\n"
     balance_string = ""
     for balance in top20.values():
-        balance_string += f"{balance}\n"
+        balance_string += f"<:HonkaiCoin:997742624477818921> {balance}\n"
     embed.add_field(name=f"User",value=user_string)
     embed.add_field(name=f"Balance",value=balance_string)
     

@@ -125,7 +125,7 @@ def blackjack(player_hand, dealer_hand):
         return "Neither"
 
 def get_final_embed(inter, player_hand, dealer_hand, bet: int):
-    embed = disnake.Embed(title=f"Bet: {bet}")
+    embed = disnake.Embed(title=f"Blackjack!", description=f"Bet: <:HonkaiCoin:997742624477818921> {bet}")
     embed.add_field(
         name=f"Player",
         value=f"{player_hand}\n**Total:** {total(player_hand)}"
@@ -173,10 +173,10 @@ class BlackjackCommand(commands.Cog):
         winner = blackjack(player_hand,dealer_hand)
         if not winner == "Neither":
             if winner == "Player":
-                description = "Player wins!"
+                description = "Bet: <:HonkaiCoin:997742624477818921> {bet}\n\nPlayer wins!"
                 update_balance(inter.author.id, bet)
             else:
-                description = "Player loses..."
+                description = "Bet: <:HonkaiCoin:997742624477818921> {bet}\n\nPlayer loses..."
                 update_balance(inter.author.id, bet*-1)
             embed = disnake.Embed(
                 title=f"Bet: {bet}",
@@ -200,7 +200,7 @@ class BlackjackCommand(commands.Cog):
             
             await inter.response.send_message(embed=embed, components=grayed_comps)
             return
-        embed = disnake.Embed(title=f"Bet: {bet}")
+        embed = disnake.Embed(title=f"Blackjack!", description=f"Bet: <:HonkaiCoin:997742624477818921> {bet}")
         embed.add_field(
             name=f"Player",
             value=f"{player_hand}\n**Total:** {total(player_hand)}"
@@ -249,7 +249,7 @@ class BlackjackCommand(commands.Cog):
                 
                 update_hands(game_id, player_hand, dealer_hand)
                 
-                embed = disnake.Embed(title=f"Bet: {bet}")
+                embed = disnake.Embed(title=f"Blackjack!",description=f"Bet: <:HonkaiCoin:997742624477818921> {bet}")
                 embed.add_field(
                     name=f"Player",
                     value=f"{player_hand}\n**Total:** {total(player_hand)}"
@@ -260,7 +260,7 @@ class BlackjackCommand(commands.Cog):
                 )
                 if total(player_hand) > 21:
                     embed = get_final_embed(inter, player_hand, dealer_hand, bet)
-                    embed.description=f"Player loses..."
+                    embed.description += f"\n\n**Player loses...**"
                     grayed_comps = get_grayed_comps(inter)
                     await inter.response.edit_message(embed=embed, components=grayed_comps)
                     update_balance(inter.author.id, bet*-1)
@@ -288,13 +288,13 @@ class BlackjackCommand(commands.Cog):
                 
                 result = score(player_hand, dealer_hand)
                 if result == "Player":
-                    embed.description = f"Player wins!"
+                    embed.description += f"\n\n**Player wins!**"
                     update_balance(inter.author.id, bet)
                 elif result == "Dealer":
-                    embed.description = f"Player loses..."
+                    embed.description += f"\n\n**Player loses...**"
                     update_balance(inter.author.id, bet*-1)
                 else:
-                    embed.description = f"Push!"
+                    embed.description += f"\n\n**Push!**"
                 await inter.response.edit_message(embed=embed, components=grayed_comps)
                 finish(game_id)
         if button_id == "blackjackquit": #Does not require game id
