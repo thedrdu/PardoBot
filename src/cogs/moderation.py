@@ -35,25 +35,21 @@ class ModerationCommand(commands.Cog):
     #     modroles[inter.guild.id] = role.id
     
     @commands.slash_command(
-        name="kick",
-        description="Kicks a user from the server.",
+        name="pardokick",
+        description="Kicks a user from the guild.",
         default_member_permissions=disnake.Permissions(kick_members=True),
         guild_only=True,
-        # guild_ids=[1234, 5678]
     )
-    async def kick(inter: disnake.ApplicationCommandInteraction, user: disnake.User, *, reason):
-        # try:
-            await inter.send(content=f"Attempting to kick {user}...", ephemeral=True)
-            await user.send(f"You have been kicked from {inter.guild.name} for: \"{reason}\"")
-            await inter.guild.kick(user)
-            await inter.edit_original_message(content=f"{user} successfully kicked!")
-        # except disnake.Forbidden:
-            # print("User's DMs are not open!")
+    async def pardokick(inter: disnake.ApplicationCommandInteraction, user: disnake.User, *, reason):
+        await inter.send(content=f"Attempting to kick {user}...", ephemeral=True)
+        await user.send(f"You have been kicked from {inter.guild.name} for: \"{reason}\"")
+        await inter.guild.kick(user)
+        await inter.edit_original_message(content=f"{user} successfully kicked!")
     
             
     @commands.slash_command(
         name="pardoban",
-        description="Bans a user from the server.",
+        description="Bans a user from the guild.",
         default_member_permissions=disnake.Permissions(ban_members=True),
         guild_only=True,
         # guild_ids=[1234, 5678]

@@ -13,7 +13,7 @@ STARTER_BALANCE = 1000
 def init_balance(user_id):
     con = sqlite3.connect(f"{DB_PATH}")
     cur = con.cursor()
-    cur.execute(f'''INSERT INTO economy (USER_ID, BALANCE) VALUES ({user_id},{STARTER_BALANCE})''')
+    cur.execute(f'''INSERT INTO economy (USER_ID, BALANCE) VALUES ({user_id},{STARTER_BALANCE});''')
     con.commit()
     con.close()
 

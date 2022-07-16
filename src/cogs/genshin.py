@@ -6,6 +6,7 @@ import collections
 import sqlite3
 import os
 from dotenv import load_dotenv
+from data.genshin_util import insert_pull, get_pulls, reset_pulls, get_pity, set_pity5, set_pity4
 
 players = {}
 instances = {} #user id and message id
@@ -156,26 +157,54 @@ def wish(amount, pity5, pity4):
 class GenshinCommand(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
+        
+    @commands.slash_command()
+    async def inventory(self, inter: disnake.ApplicationCommandInteraction):
+        dict5 = {}
+        dict4 = {}
+        dict3 = {}
+        pulls = get_pulls(inter.author.id)
+        for item in pulls:
+            if item in _5Stars.keys():
+                if item in dict5.keys():
+                    dict5[item] += 1
+                else:
+                    dict5[item] = 1
+            elif item in _4Stars.keys():
+                if item in dict4.keys():
+                    dict4[item] += 1
+                else:
+                    dict4[item] = 1
+            else:
+                if item in dict3.keys():
+                    dict3[item] += 1
+                else:
+                    dict3[item] = 1
+        embed = disnake.Embed(
+            title=f"{inter.author.name}'s Inventory"
+        )
+        value = ""
+        for item in dict5:
+            value += f"(**{dict5[item]}**) {_5Stars[item]}{item} \n"
+        value += "\n"
+        for item in dict4:
+            value += f"(**{dict4[item]}**) {_4Stars[item]}{item} \n"
+        value += "\n"
+        for item in dict3:
+            value += f"(**{dict3[item]}**) {item} \n"
+        embed.description = value
+        comps = [disnake.ui.Button(label="Quit", style=disnake.ButtonStyle.red, custom_id=f"{inter.author.id}~quitinventory")]
+        await inter.response.send_message(embed=embed,components=comps)
 
     @commands.slash_command()
     async def wish(self, inter: disnake.ApplicationCommandInteraction):
         """
         Wishes!
         """
-        global players
-        global instances
-        now = datetime.now()
-        creation_time = now.strftime("%H:%M:%S")
-        
-        players[inter.author.id] = []
-        players[inter.author.id].append(0) #pity5
-        players[inter.author.id].append(0) #pity4
-        players[inter.author.id].append([]) #inventory
-        
         comps = [
-            disnake.ui.Button(label="Wish", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~wish~0~0~{creation_time}"),
-            disnake.ui.Button(label="Wish x10", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~wish10~0~0~{creation_time}"),
-            disnake.ui.Button(label="Reset", style=disnake.ButtonStyle.gray, custom_id=f"{inter.author.id}~resetwish~{creation_time}"),
+            disnake.ui.Button(label="Wish", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~wish"),
+            disnake.ui.Button(label="Wish x10", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~wish10"),
+            disnake.ui.Button(label="Reset Embed", style=disnake.ButtonStyle.gray, custom_id=f"{inter.author.id}~resetwish"),
             disnake.ui.Button(label="Quit", style=disnake.ButtonStyle.red, custom_id=f"{inter.author.id}~quitwish")
         ]
         embed = disnake.Embed(
@@ -183,7 +212,6 @@ class GenshinCommand(commands.Cog):
             description="Press any button to begin!"
         )
         embed.set_thumbnail(f"{inter.author.avatar}")
-        embed.set_footer(text=f"Embed created at {creation_time} EST by {inter.author}")
         embed.set_author(name=f"{inter.author}", icon_url=f"{inter.author.display_avatar.url}")
         await inter.response.send_message(components=comps, embed=embed)
     
@@ -192,8 +220,6 @@ class GenshinCommand(commands.Cog):
         global _5Stars
         global _4Stars
         global _3Stars
-        global players
-        global instances
         id_parts = inter.component.custom_id.split('~')
         author_id = int(id_parts[0])
         button_id = id_parts[1]
@@ -201,16 +227,21 @@ class GenshinCommand(commands.Cog):
         if button_id == "wish":
             if author_id == inter.author.id:
                 await inter.response.defer()
-                pity5 = int(id_parts[2])
-                pity4 = int(id_parts[3])
-                creation_time = id_parts[4]
+                pity = get_pity(inter.author.id)
+                pity5 = pity[0]
+                pity4 = pity[1]
+                
                 wish_results = wish(1, pity5, pity4)
                 items = wish_results[0]
-                pity5 = wish_results[1]
-                pity4 = wish_results[2]
-
+                new_pity5 = wish_results[1]
+                new_pity4 = wish_results[2]
+                set_pity5(inter.author.id, new_pity5)
+                set_pity4(inter.author.id, new_pity4)
+                
                 description = ""
                 for item in items:
+                    insert_pull(inter.author.id, item)
+                    
                     emoji_id = ""
                     if item in _5Stars.keys():
                         emoji_id = _5Stars[item]
@@ -221,12 +252,12 @@ class GenshinCommand(commands.Cog):
                     else:
                         emoji_id = ""
                     description += f"{item} {emoji_id}\n"
-                description += f"\n**Pity: {pity5}**"
+                description += f"\n**Pity: {new_pity5}**"
                 
                 comps = [
-                    disnake.ui.Button(label="Wish", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~wish~{pity5}~{pity4}~{creation_time}"),
-                    disnake.ui.Button(label="Wish x10", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~wish10~{pity5}~{pity4}~{creation_time}"),
-                    disnake.ui.Button(label="Reset", style=disnake.ButtonStyle.gray, custom_id=f"{inter.author.id}~resetwish~{creation_time}"),
+                    disnake.ui.Button(label="Wish", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~wish"),
+                    disnake.ui.Button(label="Wish x10", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~wish10"),
+                    disnake.ui.Button(label="Reset Embed", style=disnake.ButtonStyle.gray, custom_id=f"{inter.author.id}~resetwish"),
                     disnake.ui.Button(label="Quit", style=disnake.ButtonStyle.red, custom_id=f"{inter.author.id}~quitwish")
                 ]
                 embed = disnake.Embed(
@@ -234,22 +265,26 @@ class GenshinCommand(commands.Cog):
                     description=description
                 )
                 embed.set_thumbnail(f"{inter.author.avatar}")
-                embed.set_footer(text=f"Embed created at {creation_time} EST by {inter.author}")
                 embed.set_author(name=f"{inter.author}", icon_url=f"{inter.author.display_avatar.url}")
                 await inter.edit_original_message(embed=embed, components=comps)
         if button_id == "wish10":
             if author_id == inter.author.id:
                 await inter.response.defer()
-                pity5 = int(id_parts[2])
-                pity4 = int(id_parts[3])
-                creation_time = id_parts[4]
+                pity = get_pity(inter.author.id)
+                pity5 = pity[0]
+                pity4 = pity[1]
+                
                 wish_results = wish(10, pity5, pity4)
                 items = wish_results[0]
-                pity5 = wish_results[1]
-                pity4 = wish_results[2]
+                new_pity5 = wish_results[1]
+                new_pity4 = wish_results[2]
+                set_pity5(inter.author.id, new_pity5)
+                set_pity4(inter.author.id, new_pity4)
 
                 description = ""
                 for item in items:
+                    insert_pull(inter.author.id, item)
+                    
                     emoji_id = ""
                     if item in _5Stars.keys():
                         emoji_id = _5Stars[item]
@@ -260,12 +295,12 @@ class GenshinCommand(commands.Cog):
                     else:
                         emoji_id = ""
                     description += f"{item} {emoji_id}\n"
-                description += f"\n**Pity: {pity5}**"
+                description += f"\n**Pity: {new_pity5}**"
                 
                 comps = [
-                    disnake.ui.Button(label="Wish", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~wish~{pity5}~{pity4}~{creation_time}"),
-                    disnake.ui.Button(label="Wish x10", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~wish10~{pity5}~{pity4}~{creation_time}"),
-                    disnake.ui.Button(label="Reset", style=disnake.ButtonStyle.gray, custom_id=f"{inter.author.id}~resetwish~{creation_time}"),
+                    disnake.ui.Button(label="Wish", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~wish"),
+                    disnake.ui.Button(label="Wish x10", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~wish10"),
+                    disnake.ui.Button(label="Reset Embed", style=disnake.ButtonStyle.gray, custom_id=f"{inter.author.id}~resetwish"),
                     disnake.ui.Button(label="Quit", style=disnake.ButtonStyle.red, custom_id=f"{inter.author.id}~quitwish")
                 ]
                 embed = disnake.Embed(
@@ -273,26 +308,29 @@ class GenshinCommand(commands.Cog):
                     description=description
                 )
                 embed.set_thumbnail(f"{inter.author.avatar}")
-                embed.set_footer(text=f"Embed created at {creation_time} EST by {inter.author}")
                 embed.set_author(name=f"{inter.author}", icon_url=f"{inter.author.display_avatar.url}")
                 await inter.edit_original_message(embed=embed, components=comps)
         if button_id == "resetwish":
             if author_id == inter.author.id:
-                await inter.response.defer(ephemeral=True)
-                creation_time = id_parts[2]
+                await inter.response.defer()
                 comps = [
-                    disnake.ui.Button(label="Wish", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~wish~0~0~{creation_time}"),
-                    disnake.ui.Button(label="Wish x10", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~wish10~0~0~{creation_time}"),
-                    disnake.ui.Button(label="Reset", style=disnake.ButtonStyle.gray, custom_id=f"{inter.author.id}~resetwish~{creation_time}"),
+                    disnake.ui.Button(label="Wish", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~wish"),
+                    disnake.ui.Button(label="Wish x10", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~wish10"),
+                    disnake.ui.Button(label="Reset Embed", style=disnake.ButtonStyle.gray, custom_id=f"{inter.author.id}~resetwish"),
                     disnake.ui.Button(label="Quit", style=disnake.ButtonStyle.red, custom_id=f"{inter.author.id}~quitwish")
                 ]
                 embed = disnake.Embed(
                     title="Genshin Wishing Simulator",
                     description="Press any button to begin!"
                 )
-                embed.set_footer(text=f"Embed created at {creation_time} EST by {inter.author}")
+                embed.set_thumbnail(f"{inter.author.avatar}")
+                embed.set_author(name=f"{inter.author}", icon_url=f"{inter.author.display_avatar.url}")
                 await inter.edit_original_message(embed=embed,components=comps)
         if button_id == "quitwish":
+            if author_id == inter.author.id:
+                await inter.response.defer()
+                await inter.delete_original_message()
+        if button_id == "quitinventory":
             if author_id == inter.author.id:
                 await inter.response.defer()
                 await inter.delete_original_message()

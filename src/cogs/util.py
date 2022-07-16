@@ -219,6 +219,19 @@ class UtilCommand(commands.Cog):
         await inter.send(content=f"Attempting to delete {amount} messages...", ephemeral=True)
         deleted = await inter.channel.purge(limit=amount+1)
         
+    # @commands.slash_command(
+    #     name="remindme",
+    #     description="Sets a reminder for the user.",
+    #     guild_only=True,
+    # )
+    # async def remindme(self, inter: disnake.ApplicationCommandInteraction, duration: string, reminder: string):
+    #     time_unit = duration[-1]
+    #     if time_unit == "m" or time_unit == "h" or time_unit == "d"
+    #     duration = int(duration[:-1])
+    #     await inter.response.defer()
+    #     await inter.send(content=f"Attempting to delete {amount} messages...", ephemeral=True)
+    #     deleted = await inter.channel.purge(limit=amount+1)
+        
     
     @commands.slash_command(
         name="help",

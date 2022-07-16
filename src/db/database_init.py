@@ -11,12 +11,10 @@ cur.execute('''CREATE TABLE blackjack
                DEALER_CARDS TEXT DEFAULT "", 
                GAME_STATE BOOLEAN DEFAULT 1);''')
 
-# cur.execute('''CREATE TABLE genshin
-#                (ID INTEGER PRIMARY KEY,
-#                USER_ID INT NOT NULL, 
-#                ITEM TEXT NOT NULL,
-#                AMOUNT INT DEFAULT 1,
-#                ITEM_TYPE INT NOT NULL);''')
+cur.execute('''CREATE TABLE genshin_wishes
+               (ID INTEGER PRIMARY KEY,
+               USER_ID INT NOT NULL, 
+               ITEM TEXT NOT NULL);''')
 
 cur.execute('''CREATE TABLE economy
                (ID INTEGER PRIMARY KEY,
@@ -28,6 +26,12 @@ cur.execute('''CREATE TABLE roulette
                (ID INTEGER PRIMARY KEY,
                GAME_ID INTEGER NOT NULL,
                USER_ID INTEGER NOT NULL);''')
+
+cur.execute('''CREATE TABLE genshin_pity
+            (ID INTEGER PRIMARY KEY,
+            USER_ID INT NOT NULL,
+            PITY5 INT NOT NULL,
+            PITY4 INT NOT NULL);''')
 
 con.commit()
 con.close()
