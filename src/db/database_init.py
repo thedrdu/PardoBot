@@ -24,9 +24,10 @@ cur.execute('''CREATE TABLE economy
                BALANCE INT DEFAULT 0);''')
 
 #FIGURE THIS OUT 
-cur.execute('''CREATE TABLE coinflip
-               (GAME_ID INTEGER PRIMARY KEY,
-               USER_ID INT NOT NULL);''')
+cur.execute('''CREATE TABLE roulette
+               (ID INTEGER PRIMARY KEY,
+               GAME_ID INTEGER NOT NULL,
+               USER_ID INTEGER NOT NULL);''')
 
 con.commit()
 con.close()

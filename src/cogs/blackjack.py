@@ -158,8 +158,11 @@ class BlackjackCommand(commands.Cog):
     )
     async def blackjack(self, inter: disnake.ApplicationCommandInteraction, bet: int = 0):
         player_balance = get_balance(inter.author.id)
-        if(bet > player_balance):
+        if bet > player_balance:
             await inter.response.send_message(f"Insufficient balance!", ephemeral=True)
+            return
+        if bet < 0:
+            await inter.response.send_message(f"Enter a non-negative number!", ephemeral=True)
             return
         player_hand = deal()
         dealer_hand = deal()
@@ -294,7 +297,6 @@ class BlackjackCommand(commands.Cog):
                     embed.description = f"Push!"
                 await inter.response.edit_message(embed=embed, components=grayed_comps)
                 finish(game_id)
-                return
         if button_id == "blackjackquit": #Does not require game id
             author_id = int(id_parts[0])
             if inter.author.id == author_id: #Verify author
@@ -302,7 +304,6 @@ class BlackjackCommand(commands.Cog):
                 await inter.response.defer()
                 await inter.delete_original_message()
                 finish(game_id)
-                return
         if button_id == "blackjackrules": #Does not require game id
             author_id = int(id_parts[0])
             if inter.author.id == author_id: #Verify author
@@ -320,6 +321,5 @@ class BlackjackCommand(commands.Cog):
                 )
                 embed.set_author(name=inter.author, icon_url=inter.author.display_avatar.url)
                 await inter.send(embed=embed, ephemeral=True)
-                return
 def setup(bot: commands.Bot):
     bot.add_cog(BlackjackCommand(bot))
