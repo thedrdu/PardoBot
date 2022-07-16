@@ -48,10 +48,10 @@ class MinigamesCommand(commands.Cog):
         self.bot = bot
     
     @commands.slash_command(
-        name="roulette",
-        description="Starts a roulette session.",
+        name="russianroulette",
+        description="Starts a russian roulette session.",
     )
-    async def roulette(self, inter: disnake.ApplicationCommandInteraction, bet: int):
+    async def russianroulette(self, inter: disnake.ApplicationCommandInteraction, bet: int):
         player_balance = get_balance(inter.author.id)
         if bet > player_balance:
             await inter.response.send_message(f"Insufficient balance!", ephemeral=True)
@@ -60,7 +60,7 @@ class MinigamesCommand(commands.Cog):
             await inter.response.send_message(f"Enter a non-negative number!", ephemeral=True)
             return
         
-        embed = disnake.Embed(title=f"Roulette!",description=f"A roulette game has begun!\nBuy-in price: $**{bet}**")
+        embed = disnake.Embed(title=f"Roulette!",description=f"A russian roulette game has begun!\nBuy-in price: $**{bet}**")
         embed.add_field(
             name=f"Participants",
             value=f"{inter.author.mention}\n"
@@ -92,7 +92,7 @@ class MinigamesCommand(commands.Cog):
             bet = id_parts[3]
             insert(game_id, inter.author.id)
             
-            embed = disnake.Embed(title=f"Roulette!",description=f"A roulette game has begun!\nBuy-in price: $**{bet}**")
+            embed = disnake.Embed(title=f"Roulette!",description=f"A russian roulette game has begun!\nBuy-in price: $**{bet}**")
             participants = get_participants(game_id)
             value = ""
             for user_id in participants:
@@ -138,7 +138,7 @@ class MinigamesCommand(commands.Cog):
                         temp_participants = participants[:]
                         random.shuffle(temp_participants)
                     target_user_id = int(temp_participants.pop(0))
-                    embed = disnake.Embed(title=f"Roulette!",description=f"A roulette game is in progress!\nBuy-in price: $~~**{bet}**~~\n\n<@{target_user_id}> has been chosen!")
+                    embed = disnake.Embed(title=f"Roulette!",description=f"A russian roulette game is in progress!\nBuy-in price: $~~**{bet}**~~\n\n<@{target_user_id}> has been chosen!")
                     value = ""
                     for user_id in participants:
                         value += f"<@{user_id}>\n"
@@ -153,11 +153,11 @@ class MinigamesCommand(commands.Cog):
                     
                     roll = random.randint(1,4) #NOTE: NOT 1 IN 6
                     if roll == 1: #dead
-                        embed = disnake.Embed(title=f"Roulette!",description=f"A roulette game is in progress!\nBuy-in price: $~~**{bet}**~~\n\n<@{target_user_id}> has **died!**")
+                        embed = disnake.Embed(title=f"Roulette!",description=f"A russian roulette game is in progress!\nBuy-in price: $~~**{bet}**~~\n\n<@{target_user_id}> has **died!**")
                         participants.remove(target_user_id)
                         update_balance(target_user_id, int(bet)*-1)
                     else:
-                        embed = disnake.Embed(title=f"Roulette!",description=f"A roulette game is in progress!\nBuy-in price: $~~**{bet}**~~\n\n<@{target_user_id}> has **survived!**")
+                        embed = disnake.Embed(title=f"Roulette!",description=f"A russian roulette game is in progress!\nBuy-in price: $~~**{bet}**~~\n\n<@{target_user_id}> has **survived!**")
                         
                     value = ""
                     for user_id in participants:
@@ -171,7 +171,7 @@ class MinigamesCommand(commands.Cog):
                     print(participants)
                     await asyncio.sleep(4)
                 update_balance(participants[0], int(bet)*(len(original_participants)-1))
-                embed = disnake.Embed(title=f"Roulette!",description=f"A roulette game is in progress!\nBuy-in price: $~~**{bet}**~~\n\n<@{participants[0]}> **has won the game!**")
+                embed = disnake.Embed(title=f"Roulette!",description=f"A russian roulette game has concluded!\nBuy-in price: $~~**{bet}**~~\n\n<@{participants[0]}> **has won the game!**")
                 value = ""
                 for user_id in participants:
                     value += f"<@{user_id}>\n"
