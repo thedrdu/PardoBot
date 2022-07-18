@@ -100,6 +100,7 @@ class RPSCommand(commands.Cog):
     @commands.slash_command(
         name="rps",
         description="Starts a rock paper scissors game.",
+        guild_only=True,
     )
     async def rps(self, inter: disnake.ApplicationCommandInteraction, target_user: disnake.Member, bet: int):
         if target_user.id == inter.author.id:

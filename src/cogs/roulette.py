@@ -50,6 +50,7 @@ class RouletteCommand(commands.Cog):
     @commands.slash_command(
         name="russianroulette",
         description="Starts a russian roulette session.",
+        guild_only=True,
     )
     async def russianroulette(self, inter: disnake.ApplicationCommandInteraction, bet: int):
         player_balance = get_balance(inter.author.id)
