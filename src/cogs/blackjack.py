@@ -173,10 +173,10 @@ class BlackjackCommand(commands.Cog):
         winner = blackjack(player_hand,dealer_hand)
         if not winner == "Neither":
             if winner == "Player":
-                description = "Bet: <:HonkaiCoin:997742624477818921> {bet}\n\nPlayer wins!"
+                description = f"Bet: <:HonkaiCoin:997742624477818921> {bet}\n\nPlayer wins!"
                 update_balance(inter.author.id, bet)
             else:
-                description = "Bet: <:HonkaiCoin:997742624477818921> {bet}\n\nPlayer loses..."
+                description = f"Bet: <:HonkaiCoin:997742624477818921> {bet}\n\nPlayer loses..."
                 update_balance(inter.author.id, bet*-1)
             embed = disnake.Embed(
                 title=f"Bet: {bet}",
