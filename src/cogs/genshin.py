@@ -184,10 +184,11 @@ class GenshinCommand(commands.Cog):
         global _4Stars
         global _3Stars
         id_parts = inter.component.custom_id.split('~')
-        author_id = int(id_parts[0])
+        
         button_id = id_parts[1]
         
         if button_id == "wish":
+            author_id = int(id_parts[0])
             if author_id == inter.author.id:
                 await inter.response.defer()
                 pity = get_pity(inter.author.id)
@@ -232,6 +233,7 @@ class GenshinCommand(commands.Cog):
                 embed.set_author(name=f"{inter.author}", icon_url=f"{inter.author.display_avatar.url}")
                 await inter.edit_original_message(embed=embed, components=comps)
         if button_id == "wish10":
+            author_id = int(id_parts[0])
             if author_id == inter.author.id:
                 await inter.response.defer()
                 pity = get_pity(inter.author.id)
@@ -276,6 +278,7 @@ class GenshinCommand(commands.Cog):
                 embed.set_author(name=f"{inter.author}", icon_url=f"{inter.author.display_avatar.url}")
                 await inter.edit_original_message(embed=embed, components=comps)
         if button_id == "resetwish":
+            author_id = int(id_parts[0])
             if author_id == inter.author.id:
                 await inter.response.defer()
                 comps = [
@@ -293,10 +296,12 @@ class GenshinCommand(commands.Cog):
                 embed.set_author(name=f"{inter.author}", icon_url=f"{inter.author.display_avatar.url}")
                 await inter.edit_original_message(embed=embed,components=comps)
         if button_id == "quitwish":
+            author_id = int(id_parts[0])
             if author_id == inter.author.id:
                 await inter.response.defer()
                 await inter.delete_original_message()
         if button_id == "inventorywish":
+            author_id = int(id_parts[0])
             if author_id == inter.author.id:
                 await inter.response.defer()
                 dict5 = {}

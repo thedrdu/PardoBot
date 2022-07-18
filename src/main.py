@@ -44,7 +44,8 @@ bot.load_extension("cogs.genshin")
 # bot.load_extension("cogs.moderation")
 bot.load_extension("cogs.blackjack")
 bot.load_extension("cogs.economy")
-bot.load_extension("cogs.minigames")
+bot.load_extension("cogs.roulette")
+bot.load_extension("cogs.rps")
 
 '''Passive Commands'''
 @bot.listen()

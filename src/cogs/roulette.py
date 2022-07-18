@@ -9,10 +9,10 @@ from dotenv import load_dotenv
 from data.economy_util import update_balance, get_balance
 DB_PATH = os.getenv('DB_PATH')
 
-def get_highest_game_id():
+def get_highest_game_id(table: str):
     con = sqlite3.connect(f"{DB_PATH}")
     cur = con.cursor()
-    rows = cur.execute(f'''SELECT MAX(GAME_ID) FROM roulette;''')
+    rows = cur.execute(f'''SELECT MAX(GAME_ID) FROM {table};''')
     max_game_id = rows.fetchone()[0]
     print(f"max_game_id: {max_game_id}")
     con.commit()
@@ -20,7 +20,7 @@ def get_highest_game_id():
     return max_game_id
 
 #NOTE: try using UNIQUE later
-def insert(insert_game_id: int, insert_user_id: int):
+def insert_roulette(insert_game_id: int, insert_user_id: int):
     con = sqlite3.connect(f"{DB_PATH}")
     cur = con.cursor()
     rows = cur.execute(f'''SELECT USER_ID FROM roulette WHERE GAME_ID={insert_game_id} AND USER_ID={insert_user_id}''')
@@ -30,7 +30,7 @@ def insert(insert_game_id: int, insert_user_id: int):
     con.commit()
     con.close()
 
-def get_participants(game_id):
+def get_roulette_participants(game_id):
     participants = []
     con = sqlite3.connect(f"{DB_PATH}")
     cur = con.cursor()
@@ -40,9 +40,9 @@ def get_participants(game_id):
     con.commit()
     con.close()
     return participants
-        
 
-class MinigamesCommand(commands.Cog):
+
+class RouletteCommand(commands.Cog):
     # Note that we're using self as the first argument, since the command function is inside a class.
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -60,17 +60,19 @@ class MinigamesCommand(commands.Cog):
             await inter.response.send_message(f"Enter a non-negative number!", ephemeral=True)
             return
         
-        embed = disnake.Embed(title=f"Roulette!",description=f"A russian roulette game has begun!\nBuy-in price: <:HonkaiCoin:997742624477818921> **{bet}**")
+        embed = disnake.Embed(title=f"Russian Roulette!",description=f"A russian roulette game has begun!\nBuy-in price: <:HonkaiCoin:997742624477818921> **{bet}**")
         embed.add_field(
             name=f"Participants",
             value=f"{inter.author.mention}\n"
         )
         embed.set_author(name=inter.author, icon_url=inter.author.display_avatar.url)
         
-        game_id = get_highest_game_id() + 1
+        game_id = get_highest_game_id("roulette")
         if game_id is None: 
             game_id = 1
-        insert(game_id, inter.author.id)
+        else:
+            game_id += 1
+        insert_roulette(game_id, inter.author.id)
         
         initial_comps = [
             disnake.ui.Button(label="Join", style=disnake.ButtonStyle.blurple, custom_id=f"{game_id}~roulettejoin~{inter.author.id}~{bet}"),
@@ -90,10 +92,10 @@ class MinigamesCommand(commands.Cog):
             game_id = id_parts[0]
             author_id = id_parts[2]
             bet = id_parts[3]
-            insert(game_id, inter.author.id)
+            insert_roulette(game_id, inter.author.id)
             
             embed = disnake.Embed(title=f"Russian Roulette!",description=f"A russian roulette game has begun!\nBuy-in price: <:HonkaiCoin:997742624477818921> **{bet}**")
-            participants = get_participants(game_id)
+            participants = get_roulette_participants(game_id)
             value = ""
             for user_id in participants:
                 value += f"<@{user_id}>\n"
@@ -121,7 +123,7 @@ class MinigamesCommand(commands.Cog):
                 game_id = id_parts[0]
                 author_id = id_parts[2]
                 bet = id_parts[3]
-                participants = get_participants(game_id)
+                participants = get_roulette_participants(game_id)
                 original_participants = participants[:]
                 temp_participants = participants[:]
                 author = await inter.bot.get_or_fetch_user(author_id)
@@ -151,7 +153,7 @@ class MinigamesCommand(commands.Cog):
                     
                     await asyncio.sleep(2)
                     
-                    roll = random.randint(1,4) #NOTE: NOT 1 IN 6
+                    roll = random.randint(1,3) #NOTE: NOT 1 IN 6
                     if roll == 1: #dead
                         embed = disnake.Embed(title=f"Russian Roulette!",description=f"A russian roulette game is in progress!\nBuy-in price: <:HonkaiCoin:997742624477818921> ~~**{bet}**~~\n\n<@{target_user_id}> has **died!** :headstone:")
                         participants.remove(target_user_id)
@@ -200,5 +202,6 @@ class MinigamesCommand(commands.Cog):
             )
             embed.set_author(name=inter.author, icon_url=inter.author.display_avatar.url)
             await inter.send(embed=embed, ephemeral=True)
+                    
 def setup(bot: commands.Bot):
-    bot.add_cog(MinigamesCommand(bot))
+    bot.add_cog(RouletteCommand(bot))

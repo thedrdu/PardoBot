@@ -259,12 +259,13 @@ class UtilCommand(commands.Cog):
         global polls
         global creators
         id_parts = inter.component.custom_id.split('~')
-        author_id = int(id_parts[0])
+        
         button_id = id_parts[1]
         
         max_help_pages = int((len(inter.bot.global_slash_commands) / 9) + 1)
         if button_id == "helpback":
             print("helpback")
+            author_id = int(id_parts[0])
             if inter.author.id == author_id:
                 help_page = int(id_parts[2])
                 if help_page > 1:
@@ -287,6 +288,7 @@ class UtilCommand(commands.Cog):
                     await inter.edit_original_message(embed=embed, components=comps)
         if button_id == "helpforward":
             print("helpforward")
+            author_id = int(id_parts[0])
             if inter.author.id == author_id:
                 help_page = int(id_parts[2])
                 if help_page < max_help_pages:
@@ -309,6 +311,7 @@ class UtilCommand(commands.Cog):
 
                     await inter.edit_original_message(embed=embed, components=comps)
         if button_id == "helpexit":
+            author_id = int(id_parts[0])
             if inter.author.id == author_id:
                 await inter.response.defer()
                 await inter.delete_original_message()
@@ -336,6 +339,7 @@ class UtilCommand(commands.Cog):
             embed.description = description
             await inter.edit_original_message(embed=embed)
         if button_id == "polldelete":
+            author_id = int(id_parts[0])
             if inter.author.id == author_id:
                 await inter.response.defer()
                 await inter.delete_original_message()
