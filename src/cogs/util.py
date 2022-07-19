@@ -6,10 +6,9 @@ import aiohttp
 import asyncio
 import collections
 import itertools
-from disnake.ext import commands
-from datetime import datetime
-
-from tomlkit import string
+from disnake.ext import commands, tasks
+from datetime import datetime, timedelta
+from data.general_util import set_reminder, get_reminder
 
 polls = {} #poll message id : {{option1 : count}, {option2 : count}, {option3 : count}, {option4 : count}, {option5 : count}}
 # count = -1 if option does not exist
@@ -24,6 +23,27 @@ def removevote(user_id, message_id):
 class UtilCommand(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
+        self.check.start()
+    
+    @tasks.loop(seconds=60.0)
+    async def check(self):
+        print("Checking for reminders...")
+        reminders = get_reminder()
+        for user_id in reminders:
+            print(f"reminder for {user_id}")
+            user = await self.bot.get_or_fetch_user(user_id)  
+            await user.send(reminders[user_id])
+            
+    
+    @commands.slash_command(
+        name="remindme",
+        description="Sets a reminder.",
+    )
+    async def remindme(self, inter: disnake.ApplicationCommandInteraction, reminder: str, days: int = 0, hours: int = 0, minutes: int = 0):
+        reminder_time = datetime.now() + timedelta(days=days, hours=hours, minutes=minutes)
+        set_reminder(inter.author.id, reminder, reminder_time.strftime("%Y:%m:%d:%H:%M"))
+        await inter.response.send_message(content=f"Reminder successfully set!", ephemeral=True)
+        
         
     @commands.slash_command(
         name="pfp",

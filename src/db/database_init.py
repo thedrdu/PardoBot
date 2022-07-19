@@ -33,11 +33,17 @@ cur = con.cursor()
 #             PITY5 INT NOT NULL,
 #             PITY4 INT NOT NULL);''')
 
-cur.execute('''CREATE TABLE rps
-            (ID INTEGER PRIMARY KEY,
-            GAME_ID INT NOT NULL,
-            USER_ID INT NOT NULL,
-            CHOICE TEXT NOT NULL);''')
+# cur.execute('''CREATE TABLE rps
+#             (ID INTEGER PRIMARY KEY,
+#             GAME_ID INT NOT NULL,
+#             USER_ID INT NOT NULL,
+#             CHOICE TEXT NOT NULL);''')
+
+cur.execute('''CREATE TABLE reminders
+            (REMINDER_ID INTEGER PRIMARY KEY,
+            REMINDER_TARGET INT NOT NULL,
+            REMINDER TEXT DEFAULT "",
+            REMINDER_TIME DATETIME);''')
 
 con.commit()
 con.close()
