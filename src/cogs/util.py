@@ -28,12 +28,17 @@ class UtilCommand(commands.Cog):
     @tasks.loop(seconds=60.0)
     async def check(self):
         print("Checking for reminders...")
-        reminders = get_reminder()
+        data = get_reminder()
+        reminders = data[0]
+        creation_times = data[1]
         for user_id in reminders:
             print(f"reminder for {user_id}")
-            user = await self.bot.get_or_fetch_user(user_id)  
-            await user.send(reminders[user_id])
-            
+            user = await self.bot.get_or_fetch_user(user_id)
+            embed = disnake.Embed(title=f"Reminder for {user.name}",description=f"{reminders[user_id]}")
+            embed.set_author(name=user, icon_url=user.display_avatar.url)
+            embed.set_thumbnail(user.avatar)
+            embed.set_footer(text=f"Reminder created at {creation_times[user.id]}")
+            await user.send(embed=embed)
     
     @commands.slash_command(
         name="remindme",
@@ -41,8 +46,9 @@ class UtilCommand(commands.Cog):
     )
     async def remindme(self, inter: disnake.ApplicationCommandInteraction, reminder: str, days: int = 0, hours: int = 0, minutes: int = 0):
         reminder_time = datetime.now() + timedelta(days=days, hours=hours, minutes=minutes)
-        set_reminder(inter.author.id, reminder, reminder_time.strftime("%Y:%m:%d:%H:%M"))
+        set_reminder(inter.author.id, reminder, reminder_time.strftime("%Y:%m:%d:%H:%M"), datetime.now().strftime("%Y:%m:%d:%H:%M"))
         await inter.response.send_message(content=f"Reminder successfully set!", ephemeral=True)
+        
         
         
     @commands.slash_command(

@@ -43,7 +43,8 @@ cur.execute('''CREATE TABLE reminders
             (REMINDER_ID INTEGER PRIMARY KEY,
             REMINDER_TARGET INT NOT NULL,
             REMINDER TEXT DEFAULT "",
-            REMINDER_TIME DATETIME);''')
+            REMINDER_TIME DATETIME,
+            CREATION_TIME DATETIME);''')
 
 con.commit()
 con.close()
