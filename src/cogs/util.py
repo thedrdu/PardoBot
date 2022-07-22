@@ -8,7 +8,7 @@ import collections
 import itertools
 from disnake.ext import commands, tasks
 from datetime import datetime, timedelta
-from data.general_util import set_reminder, get_reminder, create_poll, insert_option, remove_vote, add_vote, get_options, get_votes
+from data.general_util import set_reminder, get_reminder, create_poll, insert_option, remove_vote, add_vote, get_options, get_votes, get_user_description, set_user_description
 
 
 class UtilCommand(commands.Cog):
@@ -210,7 +210,7 @@ class UtilCommand(commands.Cog):
         if user is None:
             user = inter.author
         embed = disnake.Embed(
-            description=f"User Nickname: {user.name}\nUser Tag: {user}\nUser ID: {user.id}\n\nCreated At: {user.created_at}",
+            description=f"User Nickname: {user.name}\nUser Tag: {user}\nUser ID: {user.id}\n\n**\"{get_user_description(user.id)}\"**\n\nCreated At: {user.created_at}",
             colour=0xF0C43F
         )
         if inter.guild.get_member(user.id) in inter.guild.members:
@@ -225,7 +225,17 @@ class UtilCommand(commands.Cog):
         embed.set_thumbnail(user.avatar)
         embed.set_footer(text=f"Data retrieved in {round(inter.bot.latency * 1000)}ms | Information requested by {inter.author}")
         await inter.send(embed=embed)
-        
+    
+    @commands.slash_command(
+        name="setdescription",
+        description="Sets your description on your profile.",
+    )
+    async def setdescription(self, inter: disnake.ApplicationCommandInteraction, description: str):
+        set_user_description(inter.author.id, description)
+        embed = disnake.Embed(
+            description=f"Description successfully set to:\n\n{description}"
+        )
+        await inter.response.send_message(embed=embed, ephemeral=True)
         
     @commands.slash_command(
         name="purge",

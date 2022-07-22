@@ -81,3 +81,29 @@ def get_votes(option_id: int):
     con.commit()
     con.close()
     return votes
+
+def init_user_description(user_id: int):
+    con = sqlite3.connect(f"{DB_PATH}")
+    cur = con.cursor()
+    cur.execute(f'''INSERT INTO user_descriptions (USER_ID) VALUES ({user_id});''')
+    con.commit()
+    con.close()
+
+def get_user_description(user_id: int):
+    con = sqlite3.connect(f"{DB_PATH}")
+    cur = con.cursor()
+    description = cur.execute(f'''SELECT USER_DESCRIPTION FROM user_descriptions WHERE USER_ID={user_id};''').fetchone()
+    if description is None:
+        init_user_description(user_id)
+        description = cur.execute(f'''SELECT USER_DESCRIPTION FROM user_descriptions WHERE USER_ID={user_id};''').fetchone()
+    con.commit()
+    con.close()
+    return description[0]
+
+def set_user_description(user_id: int, new_description: str):
+    con = sqlite3.connect(f"{DB_PATH}")
+    cur = con.cursor()
+    cur.execute(f'''DELETE FROM user_descriptions WHERE USER_ID={user_id};''')
+    cur.execute(f'''INSERT INTO user_descriptions (USER_ID,USER_DESCRIPTION) VALUES ({user_id},"{new_description}")''')
+    con.commit()
+    con.close()
