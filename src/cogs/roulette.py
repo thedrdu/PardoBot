@@ -88,7 +88,7 @@ class RouletteCommand(commands.Cog):
     async def on_button_click(self, inter: disnake.MessageInteraction):
         id_parts = inter.component.custom_id.split('~')
         button_id = id_parts[1]
-        print(f"button_id: {button_id}")
+
         if button_id == "roulettejoin": #Requires game id
             game_id = id_parts[0]
             author_id = id_parts[2]

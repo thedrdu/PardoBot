@@ -56,13 +56,28 @@ cur = con.cursor()
 #             COINS INTEGER NOT NULL DEFAULT 0,
 #             MAX_HP INTEGER NOT NULL DEFAULT 10);''')
 
-cur.execute('''CREATE TABLE enemies
-            (ENEMY_ID INTEGER PRIMARY KEY,
-            LEVEL INTEGER NOT NULL DEFAULT 1,
-            ATTACK INTEGER NOT NULL DEFAULT 1,
-            DEFENSE INTEGER NOT NULL DEFAULT 0,
-            LUCK INTEGER NOT NULL DEFAULT 1,
-            HP INTEGER NOT NULL DEFAULT 5);''')
+# cur.execute('''CREATE TABLE enemies
+#             (ENEMY_ID INTEGER PRIMARY KEY,
+#             LEVEL INTEGER NOT NULL DEFAULT 1,
+#             ATTACK INTEGER NOT NULL DEFAULT 1,
+#             DEFENSE INTEGER NOT NULL DEFAULT 0,
+#             LUCK INTEGER NOT NULL DEFAULT 1,
+#             HP INTEGER NOT NULL DEFAULT 5);''')
+
+cur.execute('''CREATE TABLE polls
+            (POLL_ID INTEGER PRIMARY KEY,
+            POLL_TITLE TEXT);''')
+
+cur.execute('''CREATE TABLE poll_options
+            (OPTION_ID INTEGER PRIMARY KEY,
+            POLL_ID INTEGER NOT NULL,
+            OPTION_TITLE TEXT);''')
+
+cur.execute('''CREATE TABLE poll_votes
+            (VOTE_ID INTEGER PRIMARY KEY,
+            POLL_ID INTEGER NOT NULL,
+            OPTION_ID INTEGER NOT NULL,
+            USER_ID INTEGER);''')
 
 con.commit()
 con.close()

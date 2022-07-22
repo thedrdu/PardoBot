@@ -8,17 +8,9 @@ import collections
 import itertools
 from disnake.ext import commands, tasks
 from datetime import datetime, timedelta
-from data.general_util import set_reminder, get_reminder
+from data.general_util import set_reminder, get_reminder, create_poll, insert_option, remove_vote, add_vote, get_options, get_votes
 
-polls = {} #poll message id : {{option1 : count}, {option2 : count}, {option3 : count}, {option4 : count}, {option5 : count}}
-# count = -1 if option does not exist
-creators = {} #user id : poll message id
 
-def removevote(user_id, message_id):
-    if message_id in polls:
-        for option in polls[message_id]:
-            if user_id in polls[message_id][option]:
-                polls[message_id][option].remove(user_id)
 
 class UtilCommand(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -66,44 +58,42 @@ class UtilCommand(commands.Cog):
     
     @commands.slash_command(
         name="poll",
-        description="sends a poll embed.",
+        description="Sends a poll embed.",
         guild_only=True,
     )
-    async def poll(self, inter: disnake.ApplicationCommandInteraction, question: str, option1: str, option2: str, option3: str = None, option4: str = None, option5: str = None):
+    async def poll(self, inter: disnake.ApplicationCommandInteraction, title: str, option1: str, option2: str, option3: str = None, option4: str = None, option5: str = None):
         option_names = ""
         comps = []
-        data = {f"{option1}" : [], #array contains list of users who have voted.
-                f"{option2}" : []}
-
-        option_names += f"{option1}: **0**\n"
-        comps.append(disnake.ui.Button(label=f"{option1}", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~polloption1~{option1}"))
-        option_names += f"{option2}: **0**\n"
-        comps.append(disnake.ui.Button(label=f"{option2}", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~polloption2~{option2}"))
+        
+        poll_id = create_poll(title)
+        option1_id = insert_option(poll_id, option1)
+        option_names += f"{option1}: 0\n"
+        option2_id = insert_option(poll_id, option2)
+        option_names += f"{option2}: 0\n"
+        comps.append(disnake.ui.Button(label=f"{option1}", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~pollvote~{poll_id}~{option1_id}"))
+        comps.append(disnake.ui.Button(label=f"{option2}", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~pollvote~{poll_id}~{option2_id}"))
         if not option3 is None:
-            option_names += f"{option3}: **0**\n"
-            comps.append(disnake.ui.Button(label=f"{option3}", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~polloption3~{option3}"))
-            data[f"{option3}"] = []
+            option3_id = insert_option(poll_id, option3)
+            option_names += f"{option3}: 0\n"
+            comps.append(disnake.ui.Button(label=f"{option3}", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~pollvote~{poll_id}~{option3_id}"))
         if not option4 is None:
-            option_names += f"{option4}: **0**\n"
-            comps.append(disnake.ui.Button(label=f"{option4}", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~polloption4~{option4}"))
-            data[f"{option4}"] = []
+            option4_id = insert_option(poll_id, option4)
+            option_names += f"{option4}: 0\n"
+            comps.append(disnake.ui.Button(label=f"{option4}", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~pollvote~{poll_id}~{option4_id}"))
         if not option5 is None:
-            option_names += f"{option5}: **0**\n"
-            comps.append(disnake.ui.Button(label=f"{option5}", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~polloption5~{option5}"))
-            data[f"{option5}"] = []
+            option5_id = insert_option(poll_id, option5)
+            option_names += f"{option5}: 0\n"
+            comps.append(disnake.ui.Button(label=f"{option5}", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~pollvote~{poll_id}~{option5_id}"))
+
         embed = disnake.Embed(
-            title=f"{question}",
+            title=title,
             description=f"{option_names}"
         )
-        comps.append(disnake.ui.Button(label=f"Rescind", style=disnake.ButtonStyle.gray, custom_id=f"{inter.author.id}~pollrescind"))
-        comps.append(disnake.ui.Button(label=f"Delete", style=disnake.ButtonStyle.red, custom_id=f"{inter.author.id}~polldelete"))
+        comps.append(disnake.ui.Button(label=f"Rescind", style=disnake.ButtonStyle.gray, custom_id=f"{inter.author.id}~pollrescind~{poll_id}"))
+        comps.append(disnake.ui.Button(label=f"Delete", style=disnake.ButtonStyle.red, custom_id=f"{inter.author.id}~polldelete~{poll_id}"))
         embed.set_footer(text=f"A poll has been started by {inter.author}! Please press a button to vote.")
         embed.set_author(name=inter.author, icon_url=inter.author.display_avatar.url)
         await inter.response.send_message(embed=embed, components=comps, allowed_mentions=disnake.AllowedMentions.none())
-        message = await inter.original_message()
-        creators[message.id] = inter.user.id
-        polls[message.id] = data
-        print(polls[message.id])
     
     @commands.slash_command(
         name="memberlist",
@@ -341,27 +331,34 @@ class UtilCommand(commands.Cog):
             if inter.author.id == author_id:
                 await inter.response.defer()
                 await inter.delete_original_message()
-        if button_id == "polloption1" or button_id == "polloption2" or button_id == "polloption3" or button_id == "polloption4" or button_id == "polloption5":
-            option = id_parts[2]
-            removevote(inter.author.id, inter.message.id)
-            polls[inter.message.id][f"{option}"].append(inter.author.id)
-            print(polls[inter.message.id][f"{option}"])
+        if button_id == "pollvote":
+            poll_id = id_parts[2]
+            option_id = id_parts[3]
+            remove_vote(poll_id, inter.author.id)
+            add_vote(poll_id, option_id, inter.author.id)
             await inter.response.defer()
+            
             message = await inter.original_message()
             embed = message.embeds[0]
             description = ""
-            for option in polls[inter.message.id]:
-                description += f"{option}: **{len(polls[inter.message.id][option])}**\n"
+            options = get_options(poll_id)
+            for option in options:
+                votes = get_votes(option)
+                description += f"{options[option]}: {votes}\n"
             embed.description = description
             await inter.edit_original_message(embed=embed)
         if button_id == "pollrescind":
-            removevote(inter.author.id, inter.message.id)
+            poll_id = id_parts[2]
+            remove_vote(poll_id, inter.author.id)
             await inter.response.defer()
+            
             message = await inter.original_message()
             embed = message.embeds[0]
             description = ""
-            for option in polls[inter.message.id]:
-                description += f"{option}: **{len(polls[inter.message.id][option])}**\n"
+            options = get_options(poll_id)
+            for option in options:
+                votes = get_votes(option)
+                description += f"{options[option]}: {votes}\n"
             embed.description = description
             await inter.edit_original_message(embed=embed)
         if button_id == "polldelete":
