@@ -232,9 +232,12 @@ class UtilCommand(commands.Cog):
     
     @commands.slash_command(
         name="setdescription",
-        description="Sets your description on your profile.",
+        description="Sets your description on your profile. (max. 500 charcaters)",
     )
     async def setdescription(self, inter: disnake.ApplicationCommandInteraction, description: str):
+        if len(description) > 200:
+            await inter.response.send_message(content="Too long! (max. 200 characters)", ephemeral=True)
+            return
         set_user_description(inter.author.id, description)
         embed = disnake.Embed(
             description=f"Description successfully set to:\n\n{description}"
