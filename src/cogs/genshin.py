@@ -159,9 +159,9 @@ class GenshinCommand(commands.Cog):
         self.bot = bot
 
     @commands.slash_command()
-    async def wish(self, inter: disnake.ApplicationCommandInteraction):
+    async def genshin(self, inter: disnake.ApplicationCommandInteraction):
         """
-        Wishes!
+        Genshin Impact Panel
         """
         comps = [
             disnake.ui.Button(label="Wish", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~wish"),

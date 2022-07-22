@@ -39,12 +39,30 @@ cur = con.cursor()
 #             USER_ID INT NOT NULL,
 #             CHOICE TEXT NOT NULL);''')
 
-cur.execute('''CREATE TABLE reminders
-            (REMINDER_ID INTEGER PRIMARY KEY,
-            REMINDER_TARGET INT NOT NULL,
-            REMINDER TEXT DEFAULT "",
-            REMINDER_TIME DATETIME,
-            CREATION_TIME DATETIME);''')
+# cur.execute('''CREATE TABLE reminders
+#             (REMINDER_ID INTEGER PRIMARY KEY,
+#             REMINDER_TARGET INT NOT NULL,
+#             REMINDER TEXT DEFAULT "",
+#             REMINDER_TIME DATETIME,
+#             CREATION_TIME DATETIME);''')
+
+# cur.execute('''CREATE TABLE rpg_stats
+#             (USER_ID INTEGER NOT NULL,
+#             EXP INTEGER NOT NULL DEFAULT 0,
+#             ATTACK INTEGER NOT NULL DEFAULT 1,
+#             DEFENSE INTEGER NOT NULL DEFAULT 0,
+#             DEXTERITY INTEGER NOT NULL DEFAULT 1,
+#             LUCK INTEGER NOT NULL DEFAULT 1,
+#             COINS INTEGER NOT NULL DEFAULT 0,
+#             MAX_HP INTEGER NOT NULL DEFAULT 10);''')
+
+cur.execute('''CREATE TABLE enemies
+            (ENEMY_ID INTEGER PRIMARY KEY,
+            LEVEL INTEGER NOT NULL DEFAULT 1,
+            ATTACK INTEGER NOT NULL DEFAULT 1,
+            DEFENSE INTEGER NOT NULL DEFAULT 0,
+            LUCK INTEGER NOT NULL DEFAULT 1,
+            HP INTEGER NOT NULL DEFAULT 5);''')
 
 con.commit()
 con.close()
