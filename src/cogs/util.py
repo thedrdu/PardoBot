@@ -25,7 +25,11 @@ class UtilCommand(commands.Cog):
         for user_id in reminders:
             print(f"reminder for {user_id}")
             user = await self.bot.get_or_fetch_user(user_id)
-            embed = disnake.Embed(title=f"Reminder for {user.name}",description=f"{reminders[user_id]}")
+            embed = disnake.Embed(
+                title=f"Reminder for {user.name}",
+                description=f"{reminders[user_id]}",
+                colour=0xFF0000
+            )
             embed.set_author(name=user, icon_url=user.display_avatar.url)
             embed.set_thumbnail(user.avatar)
             embed.set_footer(text=f"Reminder created at {creation_times[user.id]}")
