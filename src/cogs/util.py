@@ -11,7 +11,6 @@ from datetime import datetime, timedelta
 from data.general_util import set_reminder, get_reminder, create_poll, insert_option, remove_vote, add_vote, get_options, get_votes
 
 
-
 class UtilCommand(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -42,10 +41,9 @@ class UtilCommand(commands.Cog):
         await inter.response.send_message(content=f"Reminder successfully set!", ephemeral=True)
         
         
-        
     @commands.slash_command(
         name="pfp",
-        description="Gets a target user's profile picture.",
+        description="Returns a target user's profile picture.",
     )
     async def pfp(self, inter: disnake.ApplicationCommandInteraction, user: disnake.User):
         await inter.response.defer()
@@ -62,6 +60,9 @@ class UtilCommand(commands.Cog):
         guild_only=True,
     )
     async def poll(self, inter: disnake.ApplicationCommandInteraction, title: str, option1: str, option2: str, option3: str = None, option4: str = None, option5: str = None):
+        '''
+        2 options are required. A poll can contain up to 5 options.
+        '''
         option_names = ""
         comps = []
         
@@ -203,8 +204,11 @@ class UtilCommand(commands.Cog):
     @commands.slash_command(
         name="userinfo",
         description="Gets info for a user on Discord.",
+        guild_only=True
     )
-    async def userinfo(self, inter: disnake.ApplicationCommandInteraction, user: disnake.User):
+    async def userinfo(self, inter: disnake.ApplicationCommandInteraction, user: disnake.User = None):
+        if user is None:
+            user = inter.author
         embed = disnake.Embed(
             description=f"User Nickname: {user.name}\nUser Tag: {user}\nUser ID: {user.id}\n\nCreated At: {user.created_at}",
             colour=0xF0C43F
@@ -235,20 +239,7 @@ class UtilCommand(commands.Cog):
         await inter.send(content=f"Attempting to delete {amount} messages...", ephemeral=True)
         deleted = await inter.channel.purge(limit=amount+1)
         
-    # @commands.slash_command(
-    #     name="remindme",
-    #     description="Sets a reminder for the user.",
-    #     guild_only=True,
-    # )
-    # async def remindme(self, inter: disnake.ApplicationCommandInteraction, duration: string, reminder: string):
-    #     time_unit = duration[-1]
-    #     if time_unit == "m" or time_unit == "h" or time_unit == "d"
-    #     duration = int(duration[:-1])
-    #     await inter.response.defer()
-    #     await inter.send(content=f"Attempting to delete {amount} messages...", ephemeral=True)
-    #     deleted = await inter.channel.purge(limit=amount+1)
         
-    
     @commands.slash_command(
         name="help",
         description="Returns a list of commands."
