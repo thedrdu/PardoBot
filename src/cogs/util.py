@@ -275,11 +275,11 @@ class UtilCommand(commands.Cog):
         id_parts = inter.component.custom_id.split('~')
         button_id = id_parts[1]
         
-        
+        max_help_pages = int((len(inter.bot.global_slash_commands) / 9) + 1)
         if button_id == "helpback":
             author_id = int(id_parts[0])
             if inter.author.id == author_id:
-                max_help_pages = int((len(inter.bot.global_slash_commands) / 9) + 1)
+                
                 help_page = int(id_parts[2])
                 if help_page > 1:
                     help_page -= 1
