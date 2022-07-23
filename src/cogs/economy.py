@@ -15,7 +15,7 @@ def custom_cooldown(message):
 def time_footer(inter):
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")
-    return f"Data retrieved in {round(inter.bot.latency * 1000)}ms at {current_time}"
+    return f"Data retrieved in {round(inter.bot.latency * 1000)}ms"
 
 class EconomyCommand(commands.Cog):
     def __init__(self, bot: commands.Bot):

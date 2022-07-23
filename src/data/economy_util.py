@@ -28,8 +28,8 @@ def update_balance(user_id, amount):
         init_balance(user_id)
         return STARTER_BALANCE
     current_balance = current_balance[0]
-    print(f"Current balance: {current_balance}")
-    print(f"Update Amount: {amount}")
+    # print(f"Current balance: {current_balance}")
+    # print(f"Update Amount: {amount}")
     current_balance += amount
     cur.execute(f'''UPDATE economy SET BALANCE={current_balance} WHERE USER_ID={user_id};''')
     con.commit()
@@ -60,7 +60,6 @@ def get_global_rank(user_id):
     row_count = rows.fetchone()[0]
     con.commit()
     con.close()
-    print(row_count)
     return row_count+1
 
 def get_server_rank(user_id, guild):
@@ -75,7 +74,6 @@ def get_server_rank(user_id, guild):
     row_count = rows.fetchone()[0]
     con.commit()
     con.close()
-    print(row_count)
     return row_count+1
 
 def get_guild_leaderboard(guild):

@@ -83,6 +83,23 @@ def get_final_embed(original_author: disnake.Member, target_user: disnake.Member
     embed.set_author(name=original_author, icon_url=original_author.display_avatar.url)
     return embed
 
+def get_tie_embed(original_author: disnake.Member, target_user: disnake.member, bet: int):
+    embed = disnake.Embed(
+        title=f"Rock Paper Scissors!",
+        description=f"{original_author.mention} has challenged {target_user.mention}!\nBet: <:HonkaiCoin:997742624477818921> ~~**{bet}**~~",
+        color=0x00FF00
+        )
+    embed.add_field(
+        name=f"Participants",
+        value=f"{original_author.mention}\n{target_user.mention}"
+    )
+    embed.add_field(
+        name=f"Winner",
+        value=f"**Tie!**"
+    )
+    embed.set_author(name=original_author, icon_url=original_author.display_avatar.url)
+    return embed
+
 def get_final_comps(user_id: int):
     final_comps = [
         disnake.ui.Button(label="Join", style=disnake.ButtonStyle.blurple, disabled=True),
@@ -92,8 +109,8 @@ def get_final_comps(user_id: int):
     ]
     return final_comps
 
+
 class RPSCommand(commands.Cog):
-    # Note that we're using self as the first argument, since the command function is inside a class.
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         
@@ -145,12 +162,11 @@ class RPSCommand(commands.Cog):
     async def on_button_click(self, inter: disnake.MessageInteraction):
         id_parts = inter.component.custom_id.split('~')
         button_id = id_parts[1]
-        print(f"button_id: {button_id}")
         if button_id == "rpsrock":
-            game_id = id_parts[0]
-            original_author = await inter.bot.get_or_fetch_user(id_parts[2])
-            target_user = await inter.bot.get_or_fetch_user(id_parts[3])
             if inter.author.id == int(id_parts[2]) or inter.author.id == int(id_parts[3]):
+                game_id = id_parts[0]
+                original_author = await inter.bot.get_or_fetch_user(id_parts[2])
+                target_user = await inter.bot.get_or_fetch_user(id_parts[3])
                 bet = id_parts[4]
                 insert_rps(game_id, inter.author.id, "rock")
                 if len(get_rps_participants(game_id)) == 2:
@@ -158,20 +174,7 @@ class RPSCommand(commands.Cog):
                     winner_id = results[0]
                     loser_id = results[1]
                     if winner_id == 0:
-                        embed = disnake.Embed(
-                            title=f"Rock Paper Scissors!",
-                            description=f"{original_author.mention} has challenged {target_user.mention}!\nBet: <:HonkaiCoin:997742624477818921> ~~**{bet}**~~"
-                            )
-                        embed.add_field(
-                            name=f"Participants",
-                            value=f"{original_author.mention}\n{target_user.mention}"
-                        )
-                        embed.add_field(
-                            name=f"Winner",
-                            value=f"**Tie!**"
-                        )
-                        embed.set_author(name=original_author, icon_url=original_author.display_avatar.url)
-                        await inter.response.edit_message(embed=embed,components=get_final_comps(original_author.id))
+                        await inter.response.edit_message(embed=get_tie_embed(original_author, target_user, bet),components=get_final_comps(original_author.id))
                         return
                     
                     update_balance(winner_id, int(bet))
@@ -182,11 +185,10 @@ class RPSCommand(commands.Cog):
                                                           components=get_final_comps(original_author.id))
                 await inter.send(content=f"Response recorded!", ephemeral=True)
         if button_id == "rpspaper":
-            game_id = id_parts[0]
-            original_author = await inter.bot.get_or_fetch_user(id_parts[2])
-            target_user = await inter.bot.get_or_fetch_user(id_parts[3])
-            
             if inter.author.id == int(id_parts[2]) or inter.author.id == int(id_parts[3]):
+                game_id = id_parts[0]
+                original_author = await inter.bot.get_or_fetch_user(id_parts[2])
+                target_user = await inter.bot.get_or_fetch_user(id_parts[3])
                 bet = id_parts[4]
                 insert_rps(game_id, inter.author.id, "paper")
                 if len(get_rps_participants(game_id)) == 2:
@@ -194,20 +196,7 @@ class RPSCommand(commands.Cog):
                     winner_id = results[0]
                     loser_id = results[1]
                     if winner_id == 0:
-                        embed = disnake.Embed(
-                            title=f"Rock Paper Scissors!",
-                            description=f"{original_author.mention} has challenged {target_user.mention}!\nBet: <:HonkaiCoin:997742624477818921> ~~**{bet}**~~"
-                            )
-                        embed.add_field(
-                            name=f"Participants",
-                            value=f"{original_author.mention}\n{target_user.mention}"
-                        )
-                        embed.add_field(
-                            name=f"Winner",
-                            value=f"**Tie!**"
-                        )
-                        embed.set_author(name=original_author, icon_url=original_author.display_avatar.url)
-                        await inter.response.edit_message(embed=embed,components=get_final_comps(original_author.id))
+                        await inter.response.edit_message(embed=get_tie_embed(original_author, target_user, bet),components=get_final_comps(original_author.id))
                         return
                     
                     update_balance(winner_id, int(bet))
@@ -218,11 +207,10 @@ class RPSCommand(commands.Cog):
                                                           components=get_final_comps(original_author.id))
                 await inter.send(content=f"Response recorded!", ephemeral=True)
         if button_id == "rpsscissors":
-            game_id = id_parts[0]
-            original_author = await inter.bot.get_or_fetch_user(id_parts[2])
-            target_user = await inter.bot.get_or_fetch_user(id_parts[3])
-            
             if inter.author.id == int(id_parts[2]) or inter.author.id == int(id_parts[3]):
+                game_id = id_parts[0]
+                original_author = await inter.bot.get_or_fetch_user(id_parts[2])
+                target_user = await inter.bot.get_or_fetch_user(id_parts[3])
                 bet = id_parts[4]
                 insert_rps(game_id, inter.author.id, "scissors")
                 if len(get_rps_participants(game_id)) == 2:
@@ -230,20 +218,7 @@ class RPSCommand(commands.Cog):
                     winner_id = results[0]
                     loser_id = results[1]
                     if winner_id == 0:
-                        embed = disnake.Embed(
-                            title=f"Rock Paper Scissors!",
-                            description=f"{original_author.mention} has challenged {target_user.mention}!\nBet: <:HonkaiCoin:997742624477818921> ~~**{bet}**~~"
-                            )
-                        embed.add_field(
-                            name=f"Participants",
-                            value=f"{original_author.mention}\n{target_user.mention}"
-                        )
-                        embed.add_field(
-                            name=f"Winner",
-                            value=f"**Tie!**"
-                        )
-                        embed.set_author(name=original_author, icon_url=original_author.display_avatar.url)
-                        await inter.response.edit_message(embed=embed,components=get_final_comps(original_author.id))
+                        await inter.response.edit_message(embed=get_tie_embed(original_author, target_user, bet),components=get_final_comps(original_author.id))
                         return
                         
                     update_balance(winner_id, int(bet))
@@ -252,7 +227,6 @@ class RPSCommand(commands.Cog):
                     winner = await inter.bot.get_or_fetch_user(winner_id)
                     await inter.response.edit_message(embed=get_final_embed(original_author, target_user, winner, bet),
                                                           components=get_final_comps(original_author.id))
-                    await inter.response.edit_message(embed=embed,components=get_final_comps(original_author.id))
                 await inter.send(content=f"Response recorded!", ephemeral=True)
         if button_id == "rpsquit":
             author_id = int(id_parts[0])

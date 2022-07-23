@@ -10,7 +10,6 @@ from disnake.ext import commands, tasks
 from datetime import datetime, timedelta
 from data.general_util import set_reminder, get_reminder, create_poll, insert_option, remove_vote, add_vote, get_options, get_votes, get_user_description, set_user_description
 
-
 class UtilCommand(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -18,12 +17,10 @@ class UtilCommand(commands.Cog):
     
     @tasks.loop(seconds=60.0)
     async def check(self):
-        print("Checking for reminders...")
         data = get_reminder()
         reminders = data[0]
         creation_times = data[1]
         for user_id in reminders:
-            print(f"reminder for {user_id}")
             user = await self.bot.get_or_fetch_user(user_id)
             embed = disnake.Embed(
                 title=f"Reminder for {user.name}",
@@ -43,7 +40,6 @@ class UtilCommand(commands.Cog):
         reminder_time = datetime.now() + timedelta(days=days, hours=hours, minutes=minutes)
         set_reminder(inter.author.id, reminder, reminder_time.strftime("%Y:%m:%d:%H:%M"), datetime.now().strftime("%Y:%m:%d:%H:%M"))
         await inter.response.send_message(content=f"Reminder successfully set!", ephemeral=True)
-        
         
     @commands.slash_command(
         name="pfp",
@@ -77,6 +73,7 @@ class UtilCommand(commands.Cog):
         option_names += f"{option2}: 0\n"
         comps.append(disnake.ui.Button(label=f"{option1}", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~pollvote~{poll_id}~{option1_id}"))
         comps.append(disnake.ui.Button(label=f"{option2}", style=disnake.ButtonStyle.blurple, custom_id=f"{inter.author.id}~pollvote~{poll_id}~{option2_id}"))
+        
         if not option3 is None:
             option3_id = insert_option(poll_id, option3)
             option_names += f"{option3}: 0\n"
@@ -104,7 +101,6 @@ class UtilCommand(commands.Cog):
         name="memberlist",
         description="Returns a list of server members.",
         guild_only=True,
-        # guild_ids=[1234, 5678]
     )
     async def memberlist(self, inter: disnake.ApplicationCommandInteraction):
         member_list = [member for member in inter.guild.members]
@@ -118,12 +114,10 @@ class UtilCommand(commands.Cog):
         member_list_str = member_list_str[:-2]
         await inter.response.send_message(content=f"Members**({len(member_list)-bot_count})**: {member_list_str}",allowed_mentions=disnake.AllowedMentions.none())
     
-    
     @commands.slash_command(
         name="botlist",
         description="Returns a list of server bots.",
         guild_only=True,
-        # guild_ids=[1234, 5678]
     )
     async def botlist(self, inter: disnake.ApplicationCommandInteraction):
         emoji = "<:PardoPOG:992554480681889813>"
@@ -136,7 +130,6 @@ class UtilCommand(commands.Cog):
             output += bot.mention + ", "
         output = output[:-2]
         await inter.response.send_message(f"Nya! {emoji} My fellow bots are: {output}")
-
 
     @commands.slash_command(
         name="commonuser",
@@ -164,7 +157,7 @@ class UtilCommand(commands.Cog):
             title=f"Most Common Users",
             colour=0xF0C43F,
         )
-        embed.set_footer(text=f"Data retrieved from past {message_limit} messages at {current_time}")
+        embed.set_footer(text=f"Data retrieved in {round(inter.bot.latency * 1000)}ms")
         await inter.edit_original_message(embed=embed, allowed_mentions=disnake.AllowedMentions.none())
     
     @commands.slash_command(
@@ -172,7 +165,7 @@ class UtilCommand(commands.Cog):
         description="Returns the most common word for users that have spoken in recent messages.",
         default_member_permissions=disnake.Permissions(read_message_history=True),
     )
-    async def commonword(self, inter: disnake.ApplicationCommandInteraction, message_limit: int, depth: int):
+    async def commonword(self, inter: disnake.ApplicationCommandInteraction, message_limit: int, depth: int = 1):
         now = datetime.now()
         current_time = now.strftime("%H:%M:%S")
         user_dict = {}
@@ -199,11 +192,10 @@ class UtilCommand(commands.Cog):
         embed = disnake.Embed(
             description=output,
             title=f"Most Common Words Per User",
-            colour=0xF0C43F,
+            colour=0x0000FF,
         )
-        embed.set_footer(text=f"Data retrieved from past {message_limit} messages at {current_time} EST")
+        embed.set_footer(text=f"Data retrieved in {round(inter.bot.latency * 1000)}ms")
         await inter.edit_original_message(embed=embed, allowed_mentions=disnake.AllowedMentions.none())
-            
     
     @commands.slash_command(
         name="userinfo",
@@ -280,17 +272,14 @@ class UtilCommand(commands.Cog):
         await inter.send(embed=embed,components=comps)
     @commands.Cog.listener()
     async def on_button_click(self, inter: disnake.MessageInteraction):
-        global polls
-        global creators
         id_parts = inter.component.custom_id.split('~')
-        
         button_id = id_parts[1]
         
-        max_help_pages = int((len(inter.bot.global_slash_commands) / 9) + 1)
+        
         if button_id == "helpback":
-            print("helpback")
             author_id = int(id_parts[0])
             if inter.author.id == author_id:
+                max_help_pages = int((len(inter.bot.global_slash_commands) / 9) + 1)
                 help_page = int(id_parts[2])
                 if help_page > 1:
                     help_page -= 1
@@ -311,7 +300,6 @@ class UtilCommand(commands.Cog):
                     await inter.response.defer()
                     await inter.edit_original_message(embed=embed, components=comps)
         if button_id == "helpforward":
-            print("helpforward")
             author_id = int(id_parts[0])
             if inter.author.id == author_id:
                 help_page = int(id_parts[2])
