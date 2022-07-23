@@ -1,19 +1,34 @@
 from distutils.command.config import config
 from typing import Counter
 import disnake
+import google_images_search
+from google_images_search import GoogleImagesSearch
+import fandom
+import os
 import io
 import aiohttp
 import asyncio
 import collections
 import itertools
 from disnake.ext import commands, tasks
+from dotenv import load_dotenv
 from datetime import datetime, timedelta
 from data.general_util import set_reminder, get_reminder, create_poll, insert_option, remove_vote, add_vote, get_options, get_votes, get_user_description, set_user_description
+GCS_DEVELOPER_KEY = os.getenv('GS_DEVELOPER_KEY')
+GCS_CX = os.getenv('GS_CX')
+
+# gis = GoogleImagesSearch(developer_key=API_KEY, custom_search_cx=CX)
+gis = GoogleImagesSearch(GCS_DEVELOPER_KEY, GCS_CX)
+
+
+# fandom.set_wiki("honkai-impact-3rd-archives")
+fandom.set_wiki("honkaiimpact3")
 
 class UtilCommand(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.check.start()
+        # print(fandom.search("Starry Impression", results=3))
     
     @tasks.loop(seconds=60.0)
     async def check(self):
@@ -31,6 +46,46 @@ class UtilCommand(commands.Cog):
             embed.set_thumbnail(user.avatar)
             embed.set_footer(text=f"Reminder created at {creation_times[user.id]}")
             await user.send(embed=embed)
+    
+    @commands.slash_command(
+        name="wikisearch",
+        description="Searches the HI3 Wikia.",
+    )
+    async def wikisearch(self, inter: disnake.ApplicationCommandInteraction, query: str):
+        await inter.response.defer()
+        search_results = fandom.search(query, results=1)
+        if len(search_results) == 0:
+            embed = disnake.Embed(title=f"No Pages Found!",description=f"No pages were found for: **{query}**.")
+            await inter.edit_original_message(embed=embed)
+            return
+        page_title = search_results[0][0]
+        page = fandom.page(title= page_title)
+        summary = page.summary
+        if len(summary) > 2000:
+            summary = page.summary[0:1999]
+        embed = disnake.Embed(
+            title=page.title,
+            description=f"**Summary:** {summary}",
+            color=0x0000FF
+        )
+        page_button = disnake.ui.Button(label="Open Page", style=disnake.ButtonStyle.blurple,url=page.url)
+        if len(page.sections) == 0:
+            sections = f"**None**"
+        else:
+            sections = '\n'.join(page.sections)
+        embed.add_field(name=f"Sections",value=f"{sections}")
+        
+        search_params = {
+            'q': f"honkai impact 3rd {query}",
+            'num': 1,
+            # 'fileType': 'jpg|gif|png',
+            # 'rights': 'cc_publicdomain|cc_attribute|cc_sharealike|cc_noncommercial|cc_nonderived',
+        }
+        gis.search(search_params=search_params)
+        
+        embed.set_thumbnail(url=gis.results()[0].url)
+        embed.set_footer(text=f"Data obtained from Honkai Impact 3 Wikia and Google Images in {round(inter.bot.latency * 1000)}ms")
+        await inter.edit_original_message(embed=embed,components=page_button)
     
     @commands.slash_command(
         name="remindme",
@@ -97,47 +152,29 @@ class UtilCommand(commands.Cog):
         embed.set_author(name=inter.author, icon_url=inter.author.display_avatar.url)
         await inter.response.send_message(embed=embed, components=comps, allowed_mentions=disnake.AllowedMentions.none())
     
-    @commands.slash_command(
-        name="memberlist",
-        description="Returns a list of server members.",
-        guild_only=True,
-    )
-    async def memberlist(self, inter: disnake.ApplicationCommandInteraction):
-        member_list = [member for member in inter.guild.members]
-        member_list_str = ""
-        bot_count = 0
-        for member in member_list:
-            if not member.bot:
-                member_list_str += f"{member.mention}, "
-            else:
-                bot_count += 1
-        member_list_str = member_list_str[:-2]
-        await inter.response.send_message(content=f"Members**({len(member_list)-bot_count})**: {member_list_str}",allowed_mentions=disnake.AllowedMentions.none())
-    
-    @commands.slash_command(
-        name="botlist",
-        description="Returns a list of server bots.",
-        guild_only=True,
-    )
-    async def botlist(self, inter: disnake.ApplicationCommandInteraction):
-        emoji = "<:PardoPOG:992554480681889813>"
-        bot_list = []
-        for member in inter.guild.members:
-            if member.bot and member.id != 975574636085530675:
-                bot_list.append(member)
-        output = ""
-        for bot in bot_list:
-            output += bot.mention + ", "
-        output = output[:-2]
-        await inter.response.send_message(f"Nya! {emoji} My fellow bots are: {output}")
+    # @commands.slash_command(
+    #     name="memberlist",
+    #     description="Returns a list of server members.",
+    #     guild_only=True,
+    # )
+    # async def memberlist(self, inter: disnake.ApplicationCommandInteraction):
+    #     member_list = [member for member in inter.guild.members]
+    #     member_list_str = ""
+    #     bot_count = 0
+    #     for member in member_list:
+    #         if not member.bot:
+    #             member_list_str += f"{member.mention}, "
+    #         else:
+    #             bot_count += 1
+    #     member_list_str = member_list_str[:-2]
+    #     await inter.response.send_message(content=f"Members**({len(member_list)-bot_count})**: {member_list_str}",allowed_mentions=disnake.AllowedMentions.none())
 
     @commands.slash_command(
         name="commonuser",
-        description="Returns all users that have spoken in recent messages."
+        description="Returns all users that have spoken in recent messages.",
+        default_member_permissions=disnake.Permissions(read_message_history=True),
     )
     async def commonuser(self, inter: disnake.ApplicationCommandInteraction, message_limit: int):
-        now = datetime.now()
-        current_time = now.strftime("%H:%M:%S")
         user_dict = {}
         message_limit = min(message_limit, 1000)
         await inter.response.defer()
@@ -270,6 +307,7 @@ class UtilCommand(commands.Cog):
                 value=cmd.description
             )
         await inter.send(embed=embed,components=comps)
+        
     @commands.Cog.listener()
     async def on_button_click(self, inter: disnake.MessageInteraction):
         id_parts = inter.component.custom_id.split('~')
