@@ -47,6 +47,8 @@ twt_auth.set_access_token(TWT_ACCESS_TOKEN, TWT_ACCESS_TOKEN_SECRET)
 api = tweepy.API(twt_auth)
 twt_username='thedrdu'
 
+channel_id= "UCko6H6LokKM__B03i5_vBQQ"
+
 def _get_single_video_data(self, video_id, part):
     #part can be 'snippet', 'statistics', 'contentDetails', 'topicDetails'
     url = f"https://www.googleapis.com/youtube/v3/videos?part={part}&id={video_id}&key=AIzaSyBnQDgW_vSiauko7UfVbZL7syKW1ghjBNY"
@@ -86,12 +88,12 @@ class UtilCommand(commands.Cog):
         description="Returns the latest video from the official HI3 YouTube channel."
     )
     async def latestvideo(self, inter: disnake.ApplicationCommandInteraction):
-        url = f'https://www.googleapis.com/youtube/v3/channels?part=statistics&id=UCko6H6LokKM__B03i5_vBQQ&key={GCS_DEVELOPER_KEY}'
+        url = f'https://www.googleapis.com/youtube/v3/channels?part=statistics&id={channel_id}&key={GCS_DEVELOPER_KEY}'
         json_url = requests.get(url)
         data = json.loads(json_url.text)['items'][0]['statistics']
         
         channel_videos = {}
-        url = f"https://www.googleapis.com/youtube/v3/search?key={GCS_DEVELOPER_KEY}&channelId=UCko6H6LokKM__B03i5_vBQQ&part=snippet,id&order=date"
+        url = f"https://www.googleapis.com/youtube/v3/search?key={GCS_DEVELOPER_KEY}&channelId={channel_id}&part=snippet,id&order=date"
         json_url = requests.get(url)
         data = json.loads(json_url.text)
         item_data = data['items']
