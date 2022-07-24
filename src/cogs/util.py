@@ -4,6 +4,10 @@ import disnake
 import google_images_search
 from google_images_search import GoogleImagesSearch
 import fandom
+import tweepy
+import json
+import requests
+from tqdm import tqdm
 import os
 import io
 import aiohttp
@@ -11,29 +15,57 @@ import asyncio
 import collections
 import itertools
 import genshin
+import google_auth_oauthlib.flow
+import googleapiclient.discovery
+import googleapiclient.errors
 from disnake.ext import commands, tasks
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 from data.general_util import set_reminder, get_reminder, create_poll, insert_option, remove_vote, add_vote, get_options, get_votes, get_user_description, set_user_description, set_honkai_user_info, get_honkai_user_info
-GCS_DEVELOPER_KEY = os.getenv('GS_DEVELOPER_KEY')
-GCS_CX = os.getenv('GS_CX')
+GCS_DEVELOPER_KEY = os.getenv('GCS_DEVELOPER_KEY')
+GCS_CX = os.getenv('GCS_CX')
+TWT_API_KEY = os.getenv('TWT_API_KEY')
+TWT_API_KEY_SECRET = os.getenv('TWT_API_KEY_SECRET')
+TWT_BEARER_TOKEN = os.getenv('TWT_BEARER_TOKEN')
+TWT_ACCESS_TOKEN = os.getenv('TWT_ACCESS_TOKEN')
+TWT_ACCESS_TOKEN_SECRET = os.getenv('TWT_ACCESS_TOKEN_SECRET')
 
+# scopes = ["https://www.googleapis.com/auth/youtube.readonly"]
+# os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+# api_service_name = "youtube"
+# api_version = "v3"
+# client_secrets_file = "client_secret_666813241337-86h24s6mfge7u9f3862mi8bdna4su66r.apps.googleusercontent.com.json"
+# flow = google_auth_oauthlib.flow.InstalledAppFlow.from_client_secrets_file(client_secrets_file, scopes)
+# credentials = flow.run_console()
+# youtube = googleapiclient.discovery.build(api_service_name, api_version, credentials=credentials)
 
-# gis = GoogleImagesSearch(developer_key=API_KEY, custom_search_cx=CX)
 gis = GoogleImagesSearch(GCS_DEVELOPER_KEY, GCS_CX)
-
-
-# fandom.set_wiki("honkai-impact-3rd-archives")
 fandom.set_wiki("honkaiimpact3")
+
+twt_auth = tweepy.OAuthHandler(TWT_API_KEY, TWT_API_KEY_SECRET)
+twt_auth.set_access_token(TWT_ACCESS_TOKEN, TWT_ACCESS_TOKEN_SECRET)
+api = tweepy.API(twt_auth)
+twt_username='thedrdu'
+
+def _get_single_video_data(self, video_id, part):
+    #part can be 'snippet', 'statistics', 'contentDetails', 'topicDetails'
+    url = f"https://www.googleapis.com/youtube/v3/videos?part={part}&id={video_id}&key=AIzaSyBnQDgW_vSiauko7UfVbZL7syKW1ghjBNY"
+    json_url = requests.get(url)
+    data = json.loads(json_url.text)
+    data = data['items'][0][part]
+    return data
 
 class UtilCommand(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.check.start()
-        # print(fandom.search("Starry Impression", results=3))
     
     @tasks.loop(seconds=60.0)
     async def check(self):
+        # tweets_list= api.home_timeline()
+        # tweet= tweets_list[0]
+        # print(tweet.text)
+        ''' Reminders '''
         data = get_reminder()
         reminders = data[0]
         creation_times = data[1]
@@ -48,6 +80,30 @@ class UtilCommand(commands.Cog):
             embed.set_thumbnail(user.avatar)
             embed.set_footer(text=f"Reminder created at {creation_times[user.id]}")
             await user.send(embed=embed)
+    
+    @commands.slash_command(
+        name="latestvideo",
+        description="Returns the latest video from the official HI3 YouTube channel."
+    )
+    async def latestvideo(self, inter: disnake.ApplicationCommandInteraction):
+        url = f'https://www.googleapis.com/youtube/v3/channels?part=statistics&id=UCko6H6LokKM__B03i5_vBQQ&key={GCS_DEVELOPER_KEY}'
+        json_url = requests.get(url)
+        data = json.loads(json_url.text)['items'][0]['statistics']
+        
+        channel_videos = {}
+        url = f"https://www.googleapis.com/youtube/v3/search?key={GCS_DEVELOPER_KEY}&channelId=UCko6H6LokKM__B03i5_vBQQ&part=snippet,id&order=date"
+        json_url = requests.get(url)
+        data = json.loads(json_url.text)
+        item_data = data['items']
+        for item in item_data:
+            kind = item['id']['kind']
+            if kind == 'youtube#video':
+                published_at = item['snippet']['publishedAt']
+                title = item['snippet']['title']
+                video_id = item['id']['videoId']
+                channel_videos[video_id] = {'publishedAt': published_at, 'title': title}
+        await inter.response.send_message(content=f"Latest video from HI3 YouTube channel: https://www.youtube.com/watch?v={list(channel_videos)[0]}")
+    
     
     @commands.slash_command(
         name="statsconfig",
@@ -107,7 +163,7 @@ class UtilCommand(commands.Cog):
             return
         page_title = search_results[0][0]
         page = fandom.page(title= page_title)
-        # print(page.content)
+        # print(page.html)
         summary = page.summary
         if len(summary) > 2000:
             summary = page.summary[0:1999]
@@ -134,6 +190,8 @@ class UtilCommand(commands.Cog):
         embed.set_thumbnail(url=gis.results()[0].url)
         embed.set_footer(text=f"Data obtained from Honkai Impact 3 Wikia and Google Images in {round(inter.bot.latency * 1000)}ms")
         await inter.edit_original_message(embed=embed,components=page_button)
+    
+    
     
     @commands.slash_command(
         name="remindme",
