@@ -107,3 +107,21 @@ def set_user_description(user_id: int, new_description: str):
     cur.execute(f'''INSERT INTO user_descriptions (USER_ID,USER_DESCRIPTION) VALUES ({user_id},"{new_description}")''')
     con.commit()
     con.close()
+    
+def set_honkai_user_info(user_id: int, ltuid: int, ltoken: str, honkai_uid: int):
+    con = sqlite3.connect(f"{DB_PATH}")
+    cur = con.cursor()
+    cur.execute(f'''DELETE FROM honkai_user_info WHERE USER_ID={user_id};''')
+    cur.execute(f'''INSERT INTO honkai_user_info (USER_ID,LTUID,LTOKEN,HONKAI_UID) VALUES ({user_id},{ltuid},"{ltoken}",{honkai_uid});''')
+    con.commit()
+    con.close()
+
+def get_honkai_user_info(user_id: int):
+    con = sqlite3.connect(f"{DB_PATH}")
+    cur = con.cursor()
+    row = cur.execute(f'''SELECT LTUID,LTOKEN,HONKAI_UID FROM honkai_user_info WHERE USER_ID={user_id};''').fetchone()
+    if row is None:
+        return None
+    con.commit()
+    con.close()
+    return row

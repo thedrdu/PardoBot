@@ -79,10 +79,17 @@ cur = con.cursor()
 #             OPTION_ID INTEGER NOT NULL,
 #             USER_ID INTEGER);''')
 
-cur.execute('''CREATE TABLE user_descriptions
+# cur.execute('''CREATE TABLE user_descriptions
+#             (ID INTEGER PRIMARY KEY,
+#             USER_ID INTEGER NOT NULL,
+#             USER_DESCRIPTION TEXT DEFAULT "Hello!");''')
+
+cur.execute('''CREATE TABLE honkai_user_info
             (ID INTEGER PRIMARY KEY,
             USER_ID INTEGER NOT NULL,
-            USER_DESCRIPTION TEXT DEFAULT "Hello!");''')
+            LTUID INTEGER NOT NULL,
+            LTOKEN INTEGER NOT NULL,
+            HONKAI_UID INTEGER NOT NULL);''')
 
 con.commit()
 con.close()

@@ -10,12 +10,14 @@ import aiohttp
 import asyncio
 import collections
 import itertools
+import genshin
 from disnake.ext import commands, tasks
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
-from data.general_util import set_reminder, get_reminder, create_poll, insert_option, remove_vote, add_vote, get_options, get_votes, get_user_description, set_user_description
+from data.general_util import set_reminder, get_reminder, create_poll, insert_option, remove_vote, add_vote, get_options, get_votes, get_user_description, set_user_description, set_honkai_user_info, get_honkai_user_info
 GCS_DEVELOPER_KEY = os.getenv('GS_DEVELOPER_KEY')
 GCS_CX = os.getenv('GS_CX')
+
 
 # gis = GoogleImagesSearch(developer_key=API_KEY, custom_search_cx=CX)
 gis = GoogleImagesSearch(GCS_DEVELOPER_KEY, GCS_CX)
@@ -46,6 +48,51 @@ class UtilCommand(commands.Cog):
             embed.set_thumbnail(user.avatar)
             embed.set_footer(text=f"Reminder created at {creation_times[user.id]}")
             await user.send(embed=embed)
+    
+    @commands.slash_command(
+        name="statsconfig",
+        description="Configure user HoYoLAB profile on PardoBot.",
+    )
+    async def statsconfig(self, inter: disnake.ApplicationCommandInteraction, ltuid: int, ltoken: str, honkai_uid: int):
+        set_honkai_user_info(inter.author.id,ltuid,ltoken,honkai_uid)
+        await inter.response.send_message(content=f"Successfully set user info!",ephemeral=True)
+    
+    @commands.slash_command(
+        name="stats",
+        description="Retrieves user's HI3 stats.",
+    )
+    async def stats(self, inter: disnake.ApplicationCommandInteraction):
+        user_data = get_honkai_user_info(inter.author.id)
+        if user_data is None:
+            await inter.response.send_message(content=f"User profile not yet configured! (Try `/statsconfig`)",ephemeral=True)
+            return
+        cookies = {"ltuid": user_data[0], "ltoken": user_data[1]}
+        client = genshin.Client(cookies)
+        user = await client.get_honkai_user(user_data[2])
+        embed = disnake.Embed(
+            title=f"Information for {user.info.nickname}",
+            description=f"**Level**: {user.info.level}\n**Server**: {user.info.server}\n**Active Days**: {user.stats.active_days}",
+            color=0x0000FF
+        )
+        embed.add_field(
+            name=f"Battlesuits Owned",value=f"{user.stats.battlesuits} ({user.stats.battlesuits_SSS} SSS)"
+        )
+        embed.add_field(
+            name=f"Outfits Owned",value=user.stats.outfits
+        )
+        embed.add_field(
+            name=f"Elysian Realm",value=f"High Score: {user.stats.elysian_realm.highest_score}"
+        )
+        embed.add_field(
+            name=f"Memorial Arena",value=f"Rank: {user.stats.memorial_arena.ranking}%\nScore: {user.stats.memorial_arena.score}"
+        )
+        embed.add_field(
+            name=f"Infinity Abyss",value=f"Rank: {user.stats.abyss.raw_q_singularis_rank} ({user.stats.abyss.latest_type})\nScore: {user.stats.abyss.score}"
+        )
+        embed.set_author(name=inter.author, icon_url=inter.author.display_avatar.url)
+        embed.set_thumbnail(url=inter.author.avatar.url)
+        embed.set_footer(text=f"Data retrieved in {round(inter.bot.latency * 1000)}ms")
+        await inter.response.send_message(embed=embed)
     
     @commands.slash_command(
         name="wikisearch",
