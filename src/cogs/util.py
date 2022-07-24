@@ -84,10 +84,10 @@ class UtilCommand(commands.Cog):
             name=f"Elysian Realm",value=f"High Score: {user.stats.elysian_realm.highest_score}"
         )
         embed.add_field(
-            name=f"Memorial Arena",value=f"Rank: {user.stats.memorial_arena.ranking}%\nScore: {user.stats.memorial_arena.score}"
+            name=f"Prev. Memorial Arena",value=f"Rank: {user.stats.memorial_arena.ranking}%\nScore: {user.stats.memorial_arena.score}"
         )
         embed.add_field(
-            name=f"Infinity Abyss",value=f"Rank: {user.stats.abyss.raw_q_singularis_rank} ({user.stats.abyss.latest_type})\nScore: {user.stats.abyss.score}"
+            name=f"Prev. Infinity Abyss",value=f"Rank: {user.stats.abyss.raw_q_singularis_rank} ({user.stats.abyss.latest_type})\nScore: {user.stats.abyss.score}"
         )
         embed.set_author(name=inter.author, icon_url=inter.author.display_avatar.url)
         embed.set_thumbnail(url=inter.author.avatar.url)
