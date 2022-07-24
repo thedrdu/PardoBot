@@ -63,7 +63,7 @@ async def on_message(message: disnake.Message):
     description="Returns PardoPOG."
 )
 async def pardopog(inter: disnake.ApplicationCommandInteraction):
-    f = disnake.File("./PardoPOG.png") #NOTE: This is a local file
+    f = disnake.File("./db/assets/PardoPOG.png") #NOTE: This is a local file
     await inter.send(embed=disnake.Embed().set_image(file=f))
     
 @bot.slash_command(
@@ -72,7 +72,7 @@ async def pardopog(inter: disnake.ApplicationCommandInteraction):
     guild_only=True,
 )
 async def hug(inter: disnake.ApplicationCommandInteraction, user: disnake.User):
-    f = disnake.File("./hug.gif") #NOTE: This is a local file
+    f = disnake.File("./db/assets/hug.gif") #NOTE: This is a local file
     embed = disnake.Embed(
         title=f"{inter.author.name} hugs {user.name}!",
         colour=0xF0C43F,

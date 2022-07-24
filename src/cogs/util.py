@@ -70,12 +70,12 @@ class UtilCommand(commands.Cog):
         client = genshin.Client(cookies)
         user = await client.get_honkai_user(user_data[2])
         embed = disnake.Embed(
-            title=f"Information for {user.info.nickname}",
+            title=f"{user.info.nickname}'s Profile",
             description=f"**Level**: {user.info.level}\n**Server**: {user.info.server}\n**Active Days**: {user.stats.active_days}",
             color=0x0000FF
         )
         embed.add_field(
-            name=f"Battlesuits Owned",value=f"{user.stats.battlesuits} ({user.stats.battlesuits_SSS} SSS)"
+            name=f"Battlesuits Owned",value=f"{user.stats.battlesuits} (<:Valkyrie_S3:1000596833527136276> {user.stats.battlesuits_SSS})"
         )
         embed.add_field(
             name=f"Outfits Owned",value=user.stats.outfits
@@ -107,6 +107,7 @@ class UtilCommand(commands.Cog):
             return
         page_title = search_results[0][0]
         page = fandom.page(title= page_title)
+        # print(page.content)
         summary = page.summary
         if len(summary) > 2000:
             summary = page.summary[0:1999]
@@ -216,70 +217,70 @@ class UtilCommand(commands.Cog):
     #     member_list_str = member_list_str[:-2]
     #     await inter.response.send_message(content=f"Members**({len(member_list)-bot_count})**: {member_list_str}",allowed_mentions=disnake.AllowedMentions.none())
 
-    @commands.slash_command(
-        name="commonuser",
-        description="Returns all users that have spoken in recent messages.",
-        default_member_permissions=disnake.Permissions(read_message_history=True),
-    )
-    async def commonuser(self, inter: disnake.ApplicationCommandInteraction, message_limit: int):
-        user_dict = {}
-        message_limit = min(message_limit, 1000)
-        await inter.response.defer()
-        async for msg in inter.channel.history(limit=message_limit+1):
-            if not msg.author.bot:
-                if msg.author in user_dict:
-                    user_dict[msg.author] += 1
-                else:
-                    user_dict[msg.author] = 1
-        output = ""
-        for idx,user in enumerate(sorted(user_dict, key=user_dict.get, reverse=True)):
-            if idx > 9:
-                break
-            output += f"{idx+1}. {user.mention} – **{user_dict[user]}** messages\n"
-        embed = disnake.Embed(
-            description=output,
-            title=f"Most Common Users",
-            colour=0xF0C43F,
-        )
-        embed.set_footer(text=f"Data retrieved in {round(inter.bot.latency * 1000)}ms")
-        await inter.edit_original_message(embed=embed, allowed_mentions=disnake.AllowedMentions.none())
+    # @commands.slash_command(
+    #     name="commonuser",
+    #     description="Returns all users that have spoken in recent messages.",
+    #     default_member_permissions=disnake.Permissions(read_message_history=True),
+    # )
+    # async def commonuser(self, inter: disnake.ApplicationCommandInteraction, message_limit: int):
+    #     user_dict = {}
+    #     message_limit = min(message_limit, 1000)
+    #     await inter.response.defer()
+    #     async for msg in inter.channel.history(limit=message_limit+1):
+    #         if not msg.author.bot:
+    #             if msg.author in user_dict:
+    #                 user_dict[msg.author] += 1
+    #             else:
+    #                 user_dict[msg.author] = 1
+    #     output = ""
+    #     for idx,user in enumerate(sorted(user_dict, key=user_dict.get, reverse=True)):
+    #         if idx > 9:
+    #             break
+    #         output += f"{idx+1}. {user.mention} – **{user_dict[user]}** messages\n"
+    #     embed = disnake.Embed(
+    #         description=output,
+    #         title=f"Most Common Users",
+    #         colour=0xF0C43F,
+    #     )
+    #     embed.set_footer(text=f"Data retrieved in {round(inter.bot.latency * 1000)}ms")
+    #     await inter.edit_original_message(embed=embed, allowed_mentions=disnake.AllowedMentions.none())
     
-    @commands.slash_command(
-        name="commonword",
-        description="Returns the most common word for users that have spoken in recent messages.",
-        default_member_permissions=disnake.Permissions(read_message_history=True),
-    )
-    async def commonword(self, inter: disnake.ApplicationCommandInteraction, message_limit: int, depth: int = 1):
-        now = datetime.now()
-        current_time = now.strftime("%H:%M:%S")
-        user_dict = {}
-        depth = min(depth, 5)
-        message_limit = min(message_limit, 1000)
-        await inter.response.defer()
-        async for msg in inter.channel.history(limit=message_limit+1):
-            if not msg.author.bot:
-                if msg.author in user_dict:
-                    user_dict[msg.author] += msg.content.split()
-                else:
-                    user_dict[msg.author] = msg.content.split()
-        output = ""
-        for key in user_dict:
-            data = Counter(user_dict[key])
-            most_common_words = data.most_common()
-            user_output = ""
-            for idx in range(min(depth, len(most_common_words))):
-                word = most_common_words[idx][0]
-                count = most_common_words[idx][1]
-                user_output += f"\"`{word}`\"({count} times), "
-            user_output = user_output[:-2]
-            output += f"{key.mention} – {user_output}\n"
-        embed = disnake.Embed(
-            description=output,
-            title=f"Most Common Words Per User",
-            colour=0x0000FF,
-        )
-        embed.set_footer(text=f"Data retrieved in {round(inter.bot.latency * 1000)}ms")
-        await inter.edit_original_message(embed=embed, allowed_mentions=disnake.AllowedMentions.none())
+    # @commands.slash_command(
+    #     name="commonword",
+    #     description="Returns the most common word for users that have spoken in recent messages.",
+    #     default_member_permissions=disnake.Permissions(read_message_history=True),
+    # )
+    # async def commonword(self, inter: disnake.ApplicationCommandInteraction, message_limit: int, depth: int = 1):
+    #     now = datetime.now()
+    #     current_time = now.strftime("%H:%M:%S")
+    #     user_dict = {}
+    #     depth = min(depth, 5)
+    #     message_limit = min(message_limit, 1000)
+    #     await inter.response.defer()
+    #     async for msg in inter.channel.history(limit=message_limit+1):
+    #         if not msg.author.bot:
+    #             if msg.author in user_dict:
+    #                 user_dict[msg.author] += msg.content.split()
+    #             else:
+    #                 user_dict[msg.author] = msg.content.split()
+    #     output = ""
+    #     for key in user_dict:
+    #         data = Counter(user_dict[key])
+    #         most_common_words = data.most_common()
+    #         user_output = ""
+    #         for idx in range(min(depth, len(most_common_words))):
+    #             word = most_common_words[idx][0]
+    #             count = most_common_words[idx][1]
+    #             user_output += f"\"`{word}`\"({count} times), "
+    #         user_output = user_output[:-2]
+    #         output += f"{key.mention} – {user_output}\n"
+    #     embed = disnake.Embed(
+    #         description=output,
+    #         title=f"Most Common Words Per User",
+    #         colour=0x0000FF,
+    #     )
+    #     embed.set_footer(text=f"Data retrieved in {round(inter.bot.latency * 1000)}ms")
+    #     await inter.edit_original_message(embed=embed, allowed_mentions=disnake.AllowedMentions.none())
     
     @commands.slash_command(
         name="userinfo",
@@ -330,8 +331,7 @@ class UtilCommand(commands.Cog):
         amount = min(amount, 100)
         await inter.response.defer()
         await inter.send(content=f"Attempting to delete {amount} messages...", ephemeral=True)
-        deleted = await inter.channel.purge(limit=amount+1)
-        
+        await inter.channel.purge(limit=amount+1)
         
     @commands.slash_command(
         name="help",
