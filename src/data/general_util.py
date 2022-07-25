@@ -151,3 +151,22 @@ def add_video_id(video_id: str):
     cur.execute(f'''INSERT INTO latest_videos (VIDEO_ID) VALUES ("{video_id}");''').fetchone()
     con.commit()
     con.close()
+    
+    
+'''Twitter'''
+def check_tweet_id(tweet_id: str):
+    con = sqlite3.connect(f"{DB_PATH}")
+    cur = con.cursor()
+    tweet_data = cur.execute(f'''SELECT TWEET_ID FROM latest_tweets WHERE TWEET_ID="{tweet_id}";''').fetchone()
+    if tweet_data is None:
+        return None
+    con.commit()
+    con.close()
+    return tweet_data[0]
+
+def add_tweet_id(tweet_id: str):
+    con = sqlite3.connect(f"{DB_PATH}")
+    cur = con.cursor()
+    cur.execute(f'''INSERT INTO latest_tweets (TWEET_ID) VALUES ("{tweet_id}");''').fetchone()
+    con.commit()
+    con.close()

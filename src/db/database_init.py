@@ -91,9 +91,13 @@ cur = con.cursor()
 #             LTOKEN INTEGER NOT NULL,
 #             HONKAI_UID INTEGER NOT NULL);''')
 
-cur.execute('''CREATE TABLE latest_videos
+# cur.execute('''CREATE TABLE latest_videos
+#             (ID INTEGER PRIMARY KEY,
+#             VIDEO_ID TEXT NOT NULL UNIQUE);''')
+
+cur.execute('''CREATE TABLE latest_tweets
             (ID INTEGER PRIMARY KEY,
-            VIDEO_ID TEXT NOT NULL UNIQUE);''')
+            TWEET_ID TEXT NOT NULL UNIQUE);''')
 
 con.commit()
 con.close()
