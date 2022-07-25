@@ -311,7 +311,7 @@ class UtilCommand(commands.Cog):
     
     @commands.slash_command(
         name="setdescription",
-        description="Sets your description on your profile. (max. 500 charcaters)",
+        description="Sets your description on your profile. (max. 500 characters)",
     )
     async def setdescription(self, inter: disnake.ApplicationCommandInteraction, description: str):
         if len(description) > 200:
@@ -325,7 +325,7 @@ class UtilCommand(commands.Cog):
         
     @commands.slash_command(
         name="purge",
-        description="Deletes an amount of messages(max: 100).",
+        description="Deletes an amount of messages (max. 100 messages).",
         default_member_permissions=disnake.Permissions(manage_messages=True),
         guild_only=True,
     )
@@ -362,7 +362,7 @@ class UtilCommand(commands.Cog):
         channel = self.bot.get_channel(1000906850226667630)
         embed = disnake.Embed(
             title=f"Welcome new captain!",
-            description=f"<:Pardofelis_Icon:1000849934343491695> {inter.mention} has joined the Hyperion!",
+            description=f"<:Pardofelis_Icon:1000849934343491695> {inter.mention} has boarded the Hyperion!",
             color=0x7DA565
         )
         embed.set_thumbnail(url=inter.avatar.url)
@@ -372,11 +372,10 @@ class UtilCommand(commands.Cog):
     
     @commands.Cog.listener()
     async def on_member_remove(self, inter: disnake.Member):
-        print("member left")
         channel = self.bot.get_channel(1000906850226667630)
         embed = disnake.Embed(
             title=f"Goodbye, captain...",
-            description=f"<:Pardofelis_Icon:1000849934343491695> {inter.mention} has left the Hyperion!",
+            description=f"<:Pardofelis_Icon:1000849934343491695> {inter.mention} has departed the Hyperion...",
             color=0xFF0000
         )
         embed.set_thumbnail(url=inter.avatar.url)
