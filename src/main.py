@@ -51,20 +51,19 @@ bot.load_extension("cogs.rps")
 '''Passive Commands'''
 @bot.listen()
 async def on_message(message: disnake.Message):
-    if message.author.bot:
-        return
-    if message.content.lower() == "nya":
-        await message.author.send("Nya!")
+    message = message
 
 '''Slash Commands'''
 
 @bot.slash_command(
-    name="pardopog",
-    description="Returns PardoPOG."
+    name="send",
+    description="Returns PardoPOG.",
+    default_member_permissions=disnake.Permissions(administrator=True)
 )
-async def pardopog(inter: disnake.ApplicationCommandInteraction):
-    f = disnake.File("./db/assets/PardoPOG.png") #NOTE: This is a local file
-    await inter.send(embed=disnake.Embed().set_image(file=f))
+async def send(inter: disnake.ApplicationCommandInteraction, channel: disnake.TextChannel, message: str):
+    if inter.author.id == 293555682475507724:
+        await channel.send(content=message)
+        await inter.response.send_message(embed=disnake.Embed(description=f"Message successfully sent to {channel.mention}"),ephemeral=True)
     
 @bot.slash_command(
     name="hug",
