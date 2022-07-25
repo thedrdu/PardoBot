@@ -77,7 +77,7 @@ class UtilCommand(commands.Cog):
             print(guild.name)
             channel = await self.bot.fetch_channel(1001115515168751687)
             print(channel.name)
-            await channel.send(content=f"<:PardoBot:1000849934343491695> A new video from <:AI_Chan_Icon:1001125788189470831>Ai-Chan has arrived!\n\n https://www.youtube.com/watch?v={video_id}")
+            await channel.send(content=f"<:Pardofelis_Icon:1000849934343491695>Meow! A new video from <:AI_Chan_Icon:1001125788189470831>Ai-Chan has arrived!\n\n https://www.youtube.com/watch?v={video_id}")
             #send the video to all relevant channels
         ''' Reminders '''
         data = get_reminder()
@@ -344,7 +344,7 @@ class UtilCommand(commands.Cog):
         channel = self.bot.get_channel(1000906850226667630)
         embed = disnake.Embed(
             title=f"Welcome new captain!",
-            description=f"<:PardoBot:1000849934343491695> {inter.mention} has joined the Hyperion!",
+            description=f"<:Pardofelis_Icon:1000849934343491695> {inter.mention} has joined the Hyperion!",
             color=0x7DA565
         )
         embed.set_thumbnail(url=inter.avatar.url)
@@ -358,7 +358,7 @@ class UtilCommand(commands.Cog):
         channel = self.bot.get_channel(1000906850226667630)
         embed = disnake.Embed(
             title=f"Goodbye, captain...",
-            description=f"<:PardoBot:1000849934343491695> {inter.mention} has left the Hyperion!",
+            description=f"<:Pardofelis_Icon:1000849934343491695> {inter.mention} has left the Hyperion!",
             color=0xFF0000
         )
         embed.set_thumbnail(url=inter.avatar.url)
