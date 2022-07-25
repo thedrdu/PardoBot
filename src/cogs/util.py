@@ -20,7 +20,7 @@ import googleapiclient.discovery
 import googleapiclient.errors
 from disnake.ext import commands, tasks
 from dotenv import load_dotenv
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from data.general_util import set_reminder, get_reminder, create_poll, insert_option, remove_vote, add_vote, get_options, get_votes, get_user_description, set_user_description, set_honkai_user_info, get_honkai_user_info
 GCS_DEVELOPER_KEY = os.getenv('GCS_DEVELOPER_KEY')
 GCS_CX = os.getenv('GCS_CX')
@@ -45,9 +45,9 @@ fandom.set_wiki("honkaiimpact3")
 twt_auth = tweepy.OAuthHandler(TWT_API_KEY, TWT_API_KEY_SECRET)
 twt_auth.set_access_token(TWT_ACCESS_TOKEN, TWT_ACCESS_TOKEN_SECRET)
 api = tweepy.API(twt_auth)
-twt_username='thedrdu'
+twt_username='HonkaiImpact3rd'
 
-channel_id= "UCko6H6LokKM__B03i5_vBQQ"
+channel_id="UCko6H6LokKM__B03i5_vBQQ"
 
 def _get_single_video_data(self, video_id, part):
     #part can be 'snippet', 'statistics', 'contentDetails', 'topicDetails'
@@ -64,9 +64,6 @@ class UtilCommand(commands.Cog):
     
     @tasks.loop(seconds=60.0)
     async def check(self):
-        # tweets_list= api.home_timeline()
-        # tweet= tweets_list[0]
-        # print(tweet.text)
         ''' Reminders '''
         data = get_reminder()
         reminders = data[0]
@@ -82,6 +79,15 @@ class UtilCommand(commands.Cog):
             embed.set_thumbnail(user.avatar)
             embed.set_footer(text=f"Reminder created at {creation_times[user.id]}")
             await user.send(embed=embed)
+    
+    @commands.slash_command(
+        name="latesttweet",
+        description="Returns the latest tweet from the official HI3 Twitter account."
+    )
+    async def latesttweet(self, inter: disnake.ApplicationCommandInteraction):
+        tweets_list = api.user_timeline(screen_name=twt_username, count=1)
+        tweet = tweets_list[0]
+        await inter.response.send_message(content=f"https://twitter.com/HonkaiImpact3rd/status/{tweet.id}")
     
     @commands.slash_command(
         name="latestvideo",
@@ -104,7 +110,7 @@ class UtilCommand(commands.Cog):
                 title = item['snippet']['title']
                 video_id = item['id']['videoId']
                 channel_videos[video_id] = {'publishedAt': published_at, 'title': title}
-        await inter.response.send_message(content=f"Latest video from HI3 YouTube channel: https://www.youtube.com/watch?v={list(channel_videos)[0]}")
+        await inter.response.send_message(content=f"https://www.youtube.com/watch?v={list(channel_videos)[0]}")
     
     
     @commands.slash_command(
@@ -199,8 +205,8 @@ class UtilCommand(commands.Cog):
         name="remindme",
         description="Sets a reminder.",
     )
-    async def remindme(self, inter: disnake.ApplicationCommandInteraction, reminder: str, days: int = 0, hours: int = 0, minutes: int = 0):
-        reminder_time = datetime.now() + timedelta(days=days, hours=hours, minutes=minutes)
+    async def remindme(self, inter: disnake.ApplicationCommandInteraction, reminder: str, days: int = 0, hours: int = 0, minutes: int = 1):
+        reminder_time = datetime.now().astimezone(timezone.utc) + timedelta(days=days, hours=hours, minutes=minutes)
         set_reminder(inter.author.id, reminder, reminder_time.strftime("%Y:%m:%d:%H:%M"), datetime.now().strftime("%Y:%m:%d:%H:%M"))
         await inter.response.send_message(content=f"Reminder successfully set!", ephemeral=True)
         
@@ -260,87 +266,6 @@ class UtilCommand(commands.Cog):
         embed.set_author(name=inter.author, icon_url=inter.author.display_avatar.url)
         await inter.response.send_message(embed=embed, components=comps, allowed_mentions=disnake.AllowedMentions.none())
     
-    # @commands.slash_command(
-    #     name="memberlist",
-    #     description="Returns a list of server members.",
-    #     guild_only=True,
-    # )
-    # async def memberlist(self, inter: disnake.ApplicationCommandInteraction):
-    #     member_list = [member for member in inter.guild.members]
-    #     member_list_str = ""
-    #     bot_count = 0
-    #     for member in member_list:
-    #         if not member.bot:
-    #             member_list_str += f"{member.mention}, "
-    #         else:
-    #             bot_count += 1
-    #     member_list_str = member_list_str[:-2]
-    #     await inter.response.send_message(content=f"Members**({len(member_list)-bot_count})**: {member_list_str}",allowed_mentions=disnake.AllowedMentions.none())
-
-    # @commands.slash_command(
-    #     name="commonuser",
-    #     description="Returns all users that have spoken in recent messages.",
-    #     default_member_permissions=disnake.Permissions(read_message_history=True),
-    # )
-    # async def commonuser(self, inter: disnake.ApplicationCommandInteraction, message_limit: int):
-    #     user_dict = {}
-    #     message_limit = min(message_limit, 1000)
-    #     await inter.response.defer()
-    #     async for msg in inter.channel.history(limit=message_limit+1):
-    #         if not msg.author.bot:
-    #             if msg.author in user_dict:
-    #                 user_dict[msg.author] += 1
-    #             else:
-    #                 user_dict[msg.author] = 1
-    #     output = ""
-    #     for idx,user in enumerate(sorted(user_dict, key=user_dict.get, reverse=True)):
-    #         if idx > 9:
-    #             break
-    #         output += f"{idx+1}. {user.mention} – **{user_dict[user]}** messages\n"
-    #     embed = disnake.Embed(
-    #         description=output,
-    #         title=f"Most Common Users",
-    #         colour=0xF0C43F,
-    #     )
-    #     embed.set_footer(text=f"Data retrieved in {round(inter.bot.latency * 1000)}ms")
-    #     await inter.edit_original_message(embed=embed, allowed_mentions=disnake.AllowedMentions.none())
-    
-    # @commands.slash_command(
-    #     name="commonword",
-    #     description="Returns the most common word for users that have spoken in recent messages.",
-    #     default_member_permissions=disnake.Permissions(read_message_history=True),
-    # )
-    # async def commonword(self, inter: disnake.ApplicationCommandInteraction, message_limit: int, depth: int = 1):
-    #     now = datetime.now()
-    #     current_time = now.strftime("%H:%M:%S")
-    #     user_dict = {}
-    #     depth = min(depth, 5)
-    #     message_limit = min(message_limit, 1000)
-    #     await inter.response.defer()
-    #     async for msg in inter.channel.history(limit=message_limit+1):
-    #         if not msg.author.bot:
-    #             if msg.author in user_dict:
-    #                 user_dict[msg.author] += msg.content.split()
-    #             else:
-    #                 user_dict[msg.author] = msg.content.split()
-    #     output = ""
-    #     for key in user_dict:
-    #         data = Counter(user_dict[key])
-    #         most_common_words = data.most_common()
-    #         user_output = ""
-    #         for idx in range(min(depth, len(most_common_words))):
-    #             word = most_common_words[idx][0]
-    #             count = most_common_words[idx][1]
-    #             user_output += f"\"`{word}`\"({count} times), "
-    #         user_output = user_output[:-2]
-    #         output += f"{key.mention} – {user_output}\n"
-    #     embed = disnake.Embed(
-    #         description=output,
-    #         title=f"Most Common Words Per User",
-    #         colour=0x0000FF,
-    #     )
-    #     embed.set_footer(text=f"Data retrieved in {round(inter.bot.latency * 1000)}ms")
-    #     await inter.edit_original_message(embed=embed, allowed_mentions=disnake.AllowedMentions.none())
     
     @commands.slash_command(
         name="userinfo",
@@ -415,6 +340,33 @@ class UtilCommand(commands.Cog):
             )
         await inter.send(embed=embed,components=comps)
         
+    @commands.Cog.listener()
+    async def on_member_join(self, inter: disnake.Member):
+        channel = self.bot.get_channel(1000906850226667630)
+        embed = disnake.Embed(
+            title=f"Welcome new captain!",
+            description=f"<:PardoBot:1000849934343491695> {inter.mention} has joined the Hyperion!",
+            color=0x7DA565
+        )
+        embed.set_thumbnail(url=inter.avatar.url)
+        current_time = datetime.now().astimezone(timezone.utc).strftime("%H:%M:%S")
+        embed.set_footer(text=f"{current_time} UTC",icon_url=self.bot.user.avatar.url)
+        await channel.send(embed=embed)
+    
+    @commands.Cog.listener()
+    async def on_member_remove(self, inter: disnake.Member):
+        print("member left")
+        channel = self.bot.get_channel(1000906850226667630)
+        embed = disnake.Embed(
+            title=f"Goodbye, captain...",
+            description=f"<:PardoBot:1000849934343491695> {inter.mention} has left the Hyperion!",
+            color=0xFF0000
+        )
+        embed.set_thumbnail(url=inter.avatar.url)
+        current_time = datetime.now().astimezone(timezone.utc).strftime("%H:%M:%S")
+        embed.set_footer(text=f"{current_time} UTC",icon_url=self.bot.user.avatar.url)
+        await channel.send(embed=embed)
+    
     @commands.Cog.listener()
     async def on_button_click(self, inter: disnake.MessageInteraction):
         id_parts = inter.component.custom_id.split('~')

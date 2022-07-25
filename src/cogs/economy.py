@@ -44,8 +44,6 @@ class EconomyCommand(commands.Cog):
     async def bal(self, inter: disnake.ApplicationCommandInteraction, user: disnake.Member = None):
         if user is None:
             user = inter.author
-        now = datetime.now()
-        current_time = now.strftime("%H:%M:%S")
         bal = get_balance(user.id)
         global_rank = get_global_rank(user.id)
         server_rank = get_server_rank(user.id, inter.guild)
@@ -99,8 +97,6 @@ class EconomyCommand(commands.Cog):
         if button_id == "guildleaderboard":
             author_id = int(id_parts[0])
             if inter.author.id == author_id: #Verify author
-                now = datetime.now()
-                current_time = now.strftime("%H:%M:%S") 
                 embed = get_guild_leaderboard(inter.guild)
                 embed.set_author(name=inter.author, icon_url=inter.author.display_avatar.url)
                 embed.set_footer(text=time_footer(inter))
@@ -108,8 +104,6 @@ class EconomyCommand(commands.Cog):
         if button_id == "globalleaderboard":
             author_id = int(id_parts[0])
             if inter.author.id == author_id: #Verify author
-                now = datetime.now()
-                current_time = now.strftime("%H:%M:%S") 
                 embed = get_global_leaderboard()
                 embed.set_author(name=inter.author, icon_url=inter.author.display_avatar.url)
                 embed.set_footer(text=time_footer(inter))

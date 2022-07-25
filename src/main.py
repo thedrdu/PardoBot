@@ -6,7 +6,7 @@ import os
 import asyncio
 import math
 import random
-from datetime import datetime
+from datetime import datetime, timezone
 from disnake.ext.commands import guild_only
 
 from dotenv import load_dotenv
@@ -29,8 +29,8 @@ bot = commands.Bot(
 @bot.event
 async def online():
     channel = bot.get_channel(992809780143988808) #hard-coded
-    current_time = datetime.now().strftime("%H:%M:%S")
-    await channel.send(f"PardoBot is online! [Time: {current_time}]")
+    current_time = datetime.now().astimezone(timezone.utc).strftime("%H:%M:%S")
+    await channel.send(f"PardoBot is online! [Time: {current_time} UTC]")
 
 @bot.event
 async def on_ready():

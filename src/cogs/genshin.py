@@ -1,7 +1,6 @@
 import disnake
 from disnake.ext import commands
 import random
-from datetime import datetime
 import collections
 import sqlite3
 import os

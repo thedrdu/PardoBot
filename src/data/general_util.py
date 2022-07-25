@@ -6,7 +6,7 @@ import sqlite3
 import os
 import asyncio
 from dotenv import load_dotenv
-from datetime import datetime
+from datetime import datetime, timezone
 DB_PATH = os.getenv('DB_PATH')
 
 STARTER_BALANCE = 1000
@@ -21,7 +21,7 @@ def set_reminder(user_id: int, reminder: str, reminder_time: datetime, creation_
 def get_reminder():
     reminders = {}
     creation_times = {}
-    current_time = datetime.now().strftime("%Y:%m:%d:%H:%M")
+    current_time = datetime.now().astimezone(timezone.utc).strftime("%Y:%m:%d:%H:%M")
     print(current_time)
     con = sqlite3.connect(f"{DB_PATH}")
     cur = con.cursor()
