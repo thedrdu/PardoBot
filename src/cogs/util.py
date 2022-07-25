@@ -1,27 +1,16 @@
 from distutils.command.config import config
-from typing import Counter
 import disnake
-import google_images_search
 from google_images_search import GoogleImagesSearch
-import fandom
-import tweepy
-import json
-import requests
-from tqdm import tqdm
-import os
-import io
-import aiohttp
-import asyncio
-import collections
-import itertools
-import genshin
-import google_auth_oauthlib.flow
-import googleapiclient.discovery
-import googleapiclient.errors
+import fandom, tweepy, json, requests, genshin
+import os, io, aiohttp, asyncio, collections, itertools
+import google_auth_oauthlib.flow, googleapiclient.discovery, googleapiclient.errors
 from disnake.ext import commands, tasks
 from dotenv import load_dotenv
 from datetime import datetime, timedelta, timezone
-from data.general_util import set_reminder, get_reminder, create_poll, insert_option, remove_vote, add_vote, get_options, get_votes, get_user_description, set_user_description, set_honkai_user_info, get_honkai_user_info
+from data.general_util import set_reminder, get_reminder, create_poll, insert_option, remove_vote, add_vote, get_options, get_votes
+from data.general_util import get_user_description, set_user_description
+from data.general_util import set_honkai_user_info, get_honkai_user_info
+from data.general_util import check_video_id, add_video_id
 GCS_DEVELOPER_KEY = os.getenv('GCS_DEVELOPER_KEY')
 GCS_CX = os.getenv('GCS_CX')
 TWT_API_KEY = os.getenv('TWT_API_KEY')
@@ -49,13 +38,29 @@ twt_username='HonkaiImpact3rd'
 
 channel_id="UCko6H6LokKM__B03i5_vBQQ"
 
-def _get_single_video_data(self, video_id, part):
-    #part can be 'snippet', 'statistics', 'contentDetails', 'topicDetails'
-    url = f"https://www.googleapis.com/youtube/v3/videos?part={part}&id={video_id}&key=AIzaSyBnQDgW_vSiauko7UfVbZL7syKW1ghjBNY"
+def get_latest_video():
+    url = f'https://www.googleapis.com/youtube/v3/channels?part=statistics&id={channel_id}&key={GCS_DEVELOPER_KEY}'
+    json_url = requests.get(url)
+    data = json.loads(json_url.text)['items'][0]['statistics']
+    
+    channel_videos = {}
+    url = f"https://www.googleapis.com/youtube/v3/search?key={GCS_DEVELOPER_KEY}&channelId={channel_id}&part=snippet,id&order=date"
     json_url = requests.get(url)
     data = json.loads(json_url.text)
-    data = data['items'][0][part]
-    return data
+    item_data = data['items']
+    for item in item_data:
+        kind = item['id']['kind']
+        if kind == 'youtube#video':
+            published_at = item['snippet']['publishedAt']
+            title = item['snippet']['title']
+            video_id = item['id']['videoId']
+            channel_videos[video_id] = {'publishedAt': published_at, 'title': title}
+    return list(channel_videos)[0]
+
+def get_latest_tweet():
+    tweets_list = api.user_timeline(screen_name=twt_username, count=1)
+    tweet = tweets_list[0]
+    return tweet.id
 
 class UtilCommand(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -64,6 +69,16 @@ class UtilCommand(commands.Cog):
     
     @tasks.loop(seconds=60.0)
     async def check(self):
+        video_id = get_latest_video()
+        if check_video_id(video_id) is None:
+            add_video_id(video_id)
+            #for channel in channels:
+            guild = await self.bot.fetch_guild(992494783220154429)
+            print(guild.name)
+            channel = await self.bot.fetch_channel(1001115515168751687)
+            print(channel.name)
+            await channel.send(content=f"<:PardoBot:1000849934343491695> A new video from <:AI_Chan_Icon:1001125788189470831>Ai-Chan has arrived!\n\n https://www.youtube.com/watch?v={video_id}")
+            #send the video to all relevant channels
         ''' Reminders '''
         data = get_reminder()
         reminders = data[0]
@@ -85,32 +100,16 @@ class UtilCommand(commands.Cog):
         description="Returns the latest tweet from the official HI3 Twitter account."
     )
     async def latesttweet(self, inter: disnake.ApplicationCommandInteraction):
-        tweets_list = api.user_timeline(screen_name=twt_username, count=1)
-        tweet = tweets_list[0]
-        await inter.response.send_message(content=f"https://twitter.com/HonkaiImpact3rd/status/{tweet.id}")
+        tweet_id = get_latest_tweet()
+        await inter.response.send_message(content=f"https://twitter.com/HonkaiImpact3rd/status/{tweet_id}")
     
     @commands.slash_command(
         name="latestvideo",
         description="Returns the latest video from the official HI3 YouTube channel."
     )
     async def latestvideo(self, inter: disnake.ApplicationCommandInteraction):
-        url = f'https://www.googleapis.com/youtube/v3/channels?part=statistics&id={channel_id}&key={GCS_DEVELOPER_KEY}'
-        json_url = requests.get(url)
-        data = json.loads(json_url.text)['items'][0]['statistics']
-        
-        channel_videos = {}
-        url = f"https://www.googleapis.com/youtube/v3/search?key={GCS_DEVELOPER_KEY}&channelId={channel_id}&part=snippet,id&order=date"
-        json_url = requests.get(url)
-        data = json.loads(json_url.text)
-        item_data = data['items']
-        for item in item_data:
-            kind = item['id']['kind']
-            if kind == 'youtube#video':
-                published_at = item['snippet']['publishedAt']
-                title = item['snippet']['title']
-                video_id = item['id']['videoId']
-                channel_videos[video_id] = {'publishedAt': published_at, 'title': title}
-        await inter.response.send_message(content=f"https://www.youtube.com/watch?v={list(channel_videos)[0]}")
+        video_id = get_latest_video()
+        await inter.response.send_message(content=f"https://www.youtube.com/watch?v={video_id}")
     
     
     @commands.slash_command(

@@ -11,6 +11,7 @@ DB_PATH = os.getenv('DB_PATH')
 
 STARTER_BALANCE = 1000
 
+'''Reminders'''
 def set_reminder(user_id: int, reminder: str, reminder_time: datetime, creation_time: datetime):
     con = sqlite3.connect(f"{DB_PATH}")
     cur = con.cursor()
@@ -32,6 +33,8 @@ def get_reminder():
     con.close()
     return reminders, creation_times
     
+
+'''Polls'''
 def create_poll(title: str):
     con = sqlite3.connect(f"{DB_PATH}")
     cur = con.cursor()
@@ -82,6 +85,8 @@ def get_votes(option_id: int):
     con.close()
     return votes
 
+
+'''User Descriptions'''
 def init_user_description(user_id: int):
     con = sqlite3.connect(f"{DB_PATH}")
     cur = con.cursor()
@@ -107,7 +112,9 @@ def set_user_description(user_id: int, new_description: str):
     cur.execute(f'''INSERT INTO user_descriptions (USER_ID,USER_DESCRIPTION) VALUES ({user_id},"{new_description}")''')
     con.commit()
     con.close()
-    
+
+
+'''Honkai Data'''
 def set_honkai_user_info(user_id: int, ltuid: int, ltoken: str, honkai_uid: int):
     con = sqlite3.connect(f"{DB_PATH}")
     cur = con.cursor()
@@ -125,3 +132,22 @@ def get_honkai_user_info(user_id: int):
     con.commit()
     con.close()
     return row
+
+
+'''YouTube'''
+def check_video_id(video_id: str):
+    con = sqlite3.connect(f"{DB_PATH}")
+    cur = con.cursor()
+    video_data = cur.execute(f'''SELECT VIDEO_ID FROM latest_videos WHERE VIDEO_ID="{video_id}";''').fetchone()
+    if video_data is None:
+        return None
+    con.commit()
+    con.close()
+    return video_data[0]
+
+def add_video_id(video_id: str):
+    con = sqlite3.connect(f"{DB_PATH}")
+    cur = con.cursor()
+    cur.execute(f'''INSERT INTO latest_videos (VIDEO_ID) VALUES ("{video_id}");''').fetchone()
+    con.commit()
+    con.close()

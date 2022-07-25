@@ -84,12 +84,16 @@ cur = con.cursor()
 #             USER_ID INTEGER NOT NULL,
 #             USER_DESCRIPTION TEXT DEFAULT "Hello!");''')
 
-cur.execute('''CREATE TABLE honkai_user_info
+# cur.execute('''CREATE TABLE honkai_user_info
+#             (ID INTEGER PRIMARY KEY,
+#             USER_ID INTEGER NOT NULL,
+#             LTUID INTEGER NOT NULL,
+#             LTOKEN INTEGER NOT NULL,
+#             HONKAI_UID INTEGER NOT NULL);''')
+
+cur.execute('''CREATE TABLE latest_videos
             (ID INTEGER PRIMARY KEY,
-            USER_ID INTEGER NOT NULL,
-            LTUID INTEGER NOT NULL,
-            LTOKEN INTEGER NOT NULL,
-            HONKAI_UID INTEGER NOT NULL);''')
+            VIDEO_ID TEXT NOT NULL UNIQUE);''')
 
 con.commit()
 con.close()
