@@ -1,8 +1,7 @@
-from distutils.command.config import config
 import disnake
 from google_images_search import GoogleImagesSearch
 import fandom, tweepy, json, requests, genshin
-import os, io, aiohttp, asyncio, collections, itertools
+import os, io, aiohttp, asyncio, itertools
 import google_auth_oauthlib.flow, googleapiclient.discovery, googleapiclient.errors
 from disnake.ext import commands, tasks
 from dotenv import load_dotenv
@@ -217,7 +216,6 @@ class UtilCommand(commands.Cog):
         await inter.edit_original_message(embed=embed,components=page_button)
     
     
-    
     @commands.slash_command(
         name="remindme",
         description="Sets a reminder.",
@@ -228,10 +226,10 @@ class UtilCommand(commands.Cog):
         await inter.response.send_message(content=f"Reminder successfully set!", ephemeral=True)
         
     @commands.slash_command(
-        name="pfp",
-        description="Returns a target user's profile picture.",
+        name="avatar",
+        description="Returns the target user's avatar.",
     )
-    async def pfp(self, inter: disnake.ApplicationCommandInteraction, user: disnake.User):
+    async def avatar(self, inter: disnake.ApplicationCommandInteraction, user: disnake.User):
         await inter.response.defer()
         async with aiohttp.ClientSession() as session:
             async with session.get(user.avatar.url) as resp:
@@ -286,7 +284,7 @@ class UtilCommand(commands.Cog):
     
     @commands.slash_command(
         name="userinfo",
-        description="Gets info for a user on Discord.",
+        description="Retrieves the target user's information.",
         guild_only=True
     )
     async def userinfo(self, inter: disnake.ApplicationCommandInteraction, user: disnake.User = None):
@@ -307,30 +305,35 @@ class UtilCommand(commands.Cog):
         embed.set_author(name=user, icon_url=user.display_avatar.url)
         embed.set_thumbnail(user.avatar)
         embed.set_footer(text=f"Data retrieved in {round(inter.bot.latency * 1000)}ms | Information requested by {inter.author}")
+        
+        
+        booster_ids = [booster.id for booster in inter.guild.premium_subscribers]
+        if user.id in booster_ids:
+            embed.color = 0xF47FFF
         await inter.send(embed=embed)
     
     @commands.slash_command(
         name="setdescription",
-        description="Sets your description on your profile. (max. 500 characters)",
+        description="Sets user description on profile. (max. 200 characters)",
     )
     async def setdescription(self, inter: disnake.ApplicationCommandInteraction, description: str):
         if len(description) > 200:
             await inter.response.send_message(content="Too long! (max. 200 characters)", ephemeral=True)
-            return
-        set_user_description(inter.author.id, description)
-        embed = disnake.Embed(
-            description=f"Description successfully set to:\n\n{description}"
-        )
-        await inter.response.send_message(embed=embed, ephemeral=True)
+        else:
+            set_user_description(inter.author.id, description)
+            embed = disnake.Embed(
+                description=f"Description successfully set to:\n\n{description}"
+            )
+            await inter.response.send_message(embed=embed, ephemeral=True)
         
     @commands.slash_command(
         name="purge",
-        description="Deletes an amount of messages (max. 100 messages).",
+        description="Deletes messages from the current channel (max. 500 messages).",
         default_member_permissions=disnake.Permissions(manage_messages=True),
         guild_only=True,
     )
     async def purge(self, inter: disnake.ApplicationCommandInteraction, amount: int):
-        amount = min(amount, 100)
+        amount = min(amount, 500)
         await inter.response.defer()
         await inter.send(content=f"Attempting to delete {amount} messages...", ephemeral=True)
         await inter.channel.purge(limit=amount+1)
@@ -359,6 +362,7 @@ class UtilCommand(commands.Cog):
         
     @commands.Cog.listener()
     async def on_member_join(self, inter: disnake.Member):
+        #Have to config this to be a unique channel for each server
         channel = self.bot.get_channel(1000906850226667630)
         embed = disnake.Embed(
             title=f"Welcome new captain!",

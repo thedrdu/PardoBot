@@ -1,14 +1,10 @@
-# author: thedrdu
+# author: thedrdu#2310 | thedrdu@gmail.com
 
 import disnake
 from disnake.ext import commands
 import os
-import asyncio
-import math
-import random
 from datetime import datetime, timezone
 from disnake.ext.commands import guild_only
-
 from dotenv import load_dotenv
 from isort import file, stream
 load_dotenv()
@@ -49,22 +45,21 @@ bot.load_extension("cogs.rps")
 # bot.load_extension("cogs.RPG")
 
 '''Passive Commands'''
-@bot.listen()
-async def on_message(message: disnake.Message):
-    message = message
+# @bot.listen()
+# async def on_message(message: disnake.Message):
+#     message = message
 
 '''Slash Commands'''
 
 @bot.slash_command(
     name="send",
-    description="Returns PardoPOG.",
+    description="Sends a message through PardoBot to a specified channel.",
     default_member_permissions=disnake.Permissions(administrator=True)
 )
 async def send(inter: disnake.ApplicationCommandInteraction, channel: disnake.TextChannel, message: str):
-    if inter.author.id == 293555682475507724:
-        await channel.send(content=message)
-        await inter.response.send_message(embed=disnake.Embed(description=f"Message successfully sent to {channel.mention}"),ephemeral=True)
-    
+    await channel.send(content=message)
+    await inter.response.send_message(embed=disnake.Embed(description=f"Message successfully sent to {channel.mention}"),ephemeral=True)
+
 @bot.slash_command(
     name="hug",
     description="Hugs a user.",
