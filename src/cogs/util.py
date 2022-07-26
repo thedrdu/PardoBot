@@ -39,31 +39,18 @@ channel_id="UCko6H6LokKM__B03i5_vBQQ"
 uploads_id="UUko6H6LokKM__B03i5_vBQQ"
 
 def get_latest_video():
-    # url = f'https://www.googleapis.com/youtube/v3/channels?part=statistics&id={channel_id}&key={GCS_DEVELOPER_KEY}'
-    # json_url = requests.get(url)
-    # data = json.loads(json_url.text)['items'][0]['statistics']
-    
-    channel_videos = {}
-    # url = f"https://www.googleapis.com/youtube/v3/channels?part=contentDetails&forUsername=HonkaiImpact3rdGlobal&key={GCS_DEVELOPER_KEY}"
-    url = f"https://www.googleapis.com/youtube/v3/playlistItems?key={GCS_DEVELOPER_KEY}&part=snippet%2CcontentDetails&playlistId={uploads_id},id&order=date&maxResults=1"
+    url = f"https://www.googleapis.com/youtube/v3/playlistItems?part=snippet%2CcontentDetails&maxResults=1&playlistId={uploads_id}&key={GCS_DEVELOPER_KEY}"
     # url = f"https://www.googleapis.com/youtube/v3/search?key={GCS_DEVELOPER_KEY}&channelId={channel_id}&part=snippet,id&order=date&maxResults=1"
     json_url = requests.get(url)
     data = json.loads(json_url.text)
-    print(data)
-    item_data = data['items']
-    for item in item_data:
-        kind = item['id']['kind']
-        if kind == 'youtube#video':
-            published_at = item['snippet']['publishedAt']
-            title = item['snippet']['title']
-            video_id = item['id']['videoId']
-            channel_videos[video_id] = {'publishedAt': published_at, 'title': title}
-    return list(channel_videos)[0]
+    # print(data)
+    video_id = data['items'][0]['snippet']['resourceId']['videoId']
+    return video_id
 
 def get_latest_tweet():
     tweets_list = api.user_timeline(screen_name=twt_username, count=1)
     tweet = tweets_list[0]
-    print(tweet.user.profile_image_url_https)
+    # print(tweet.user.profile_image_url_https)
     return tweet.id
 
 class UtilCommand(commands.Cog):
@@ -72,7 +59,7 @@ class UtilCommand(commands.Cog):
         self.reminder_check.start()
         self.social_check.start()
     
-    @tasks.loop(seconds=300.0)
+    @tasks.loop(seconds=60.0)
     async def social_check(self):
         tweet_id = get_latest_tweet()
         if check_tweet_id(tweet_id) is None:
@@ -83,18 +70,19 @@ class UtilCommand(commands.Cog):
             channel = await self.bot.fetch_channel(1001115515168751687)
             print(channel.name)
             await channel.send(content=f"<:Pardofelis_Icon:1000849934343491695>Meow! A new <:Twitter_Icon:1001216857166053417>tweet from <:AI_Chan_Icon:1001125788189470831>Ai-Chan has arrived!\n\n https://twitter.com/{twt_username}/status/{tweet_id}")
-        
-        # video_id = get_latest_video()
-        # if check_video_id(video_id) is None:
-        #     add_video_id(video_id)
-        #     #for channel in channels:
-        #     guild = await self.bot.fetch_guild(992494783220154429)
-        #     print(guild.name)
-        #     channel = await self.bot.fetch_channel(1001115515168751687)
-        #     print(channel.name)
-        #     await channel.send(content=f"<:Pardofelis_Icon:1000849934343491695>Meow! A new video from <:AI_Chan_Icon:1001125788189470831>Ai-Chan has arrived!\n\n https://www.youtube.com/watch?v={video_id}")
+        print("tweet found")
+        video_id = get_latest_video()
+        if check_video_id(video_id) is None:
+            add_video_id(video_id)
+            #for channel in channels:
+            guild = await self.bot.fetch_guild(992494783220154429)
+            print(guild.name)
+            channel = await self.bot.fetch_channel(1001115515168751687)
+            print(channel.name)
+            await channel.send(content=f"<:Pardofelis_Icon:1000849934343491695>Meow! A new video from <:AI_Chan_Icon:1001125788189470831>Ai-Chan has arrived!\n\n https://www.youtube.com/watch?v={video_id}")
             #send the video to all relevant channels
-    
+        print("video found")
+        
     @tasks.loop(seconds=60.0)
     async def reminder_check(self):
         ''' Reminders '''
