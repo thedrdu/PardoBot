@@ -69,7 +69,7 @@ class UtilCommand(commands.Cog):
             print(guild.name)
             channel = await self.bot.fetch_channel(1001115515168751687)
             print(channel.name)
-            await channel.send(content=f"<:Pardofelis_Icon:1000849934343491695>Meow! A new <:Twitter_Icon:1001216857166053417>tweet from <:AI_Chan_Icon:1001125788189470831>Ai-Chan has arrived!\n\n https://twitter.com/{twt_username}/status/{tweet_id}")
+            await channel.send(content=f"<:Pardofelis_Icon:1000849934343491695>Meow! A new tweet from <:AI_Chan_Icon:1001125788189470831>Ai-Chan has arrived!\n\n https://twitter.com/{twt_username}/status/{tweet_id}")
         print("tweet found")
         video_id = get_latest_video()
         if check_video_id(video_id) is None:
