@@ -1,6 +1,4 @@
-
 #Might paywall this because it could cost money to run on API
-
 
 import functools
 import disnake
