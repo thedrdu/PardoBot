@@ -26,6 +26,32 @@ html {
 }
 
 
+.backgroundColorShift {
+    height: 100px;
+    background-color: #c5a599;
+    animation-name: backgroundColorShift; 
+    animation-delay: 0s;  
+    animation-duration: 2s; 
+    animation-fill-mode: forwards;
+}
+
+@keyframes backgroundColorShift {  
+    0% { background-color: #c5a599; }
+    100% { background-color: #f9d8cc; }
+}
+
+
+@font-face {
+    font-family: "Righteous";
+    src: url("../fonts/Righteous-Regular.ttf");
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "Open Sans";
+    src: url("../fonts/OpenSans-Regular.ttf");
+    font-weight: normal;
+}
 
 @font-face {
     font-family: "LEMONMILK";
@@ -175,9 +201,9 @@ ul li a:hover {
 }
 
 .navbar-custom {
-    height:150px;
+    height:125px;
 }
-
+/* 
 img.custom:hover {
     transition: .2s;
     transform: scale(1.15);
@@ -187,7 +213,7 @@ ul li a:hover img {
     transition: .2s;
     transform: scale(1.1);
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-}
+} */
 
 ul li a img {
     transition: .2s;

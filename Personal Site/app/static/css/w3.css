@@ -116,8 +116,8 @@ hr{border:0;border-top:1px solid #eee;margin:20px 0}
 .w3-animate-left{position:relative;animation:animateleft 1.5s}@keyframes animateleft{from{left:-300px;opacity:0} to{left:0;opacity:1}}
 .w3-animate-right{position:relative;animation:animateright 1.5}@keyframes animateright{from{right:-300px;opacity:0} to{right:0;opacity:1}}
 .w3-animate-bottom{position:relative;animation:animatebottom 1.5s;visibility:visible}@keyframes animatebottom{from{bottom:-300px;opacity:0} to{bottom:0;opacity:1}}
-.w3-animate-bottom-delay1{position:relative;animation:animatebottom 1.5s;animation-delay: 0.5s;visibility:hidden}@keyframes animatebottom{from{bottom:-200px;opacity:0} to{bottom:0;opacity:1} 0%{visibility:visible}}
-.w3-animate-bottom-delay2{position:relative;animation:animatebottom 1.5s;animation-delay: 1s;visibility:hidden}@keyframes animatebottom{from{bottom:-200px;opacity:0} to{bottom:0;opacity:1} 0%{visibility:visible}}
+.w3-animate-bottom-delay1{position:relative;animation:animatebottom 1.5s;animation-fill-mode: forwards;animation-delay: 0.5s;visibility:hidden}@keyframes animatebottom{from{bottom:-100px;opacity:0} to{bottom:0;opacity:1} 0%{visibility:visible} 100%{visibility:visible; opacity: 1}}
+.w3-animate-bottom-delay2{position:relative;animation:animatebottom 1.5s;animation-fill-mode: forwards;animation-delay: 1s;visibility:hidden}@keyframes animatebottom{from{bottom:-100px;opacity:0} to{bottom:0;opacity:1} 0%{visibility:visible} 100%{visibility:visible; opacity: 1}}
 .w3-animate-zoom {animation:animatezoom 0.6s}@keyframes animatezoom{from{transform:scale(0)} to{transform:scale(1)}}
 .w3-animate-input{transition:width 0.4s ease-in-out}.w3-animate-input:focus{width:100%!important}
 .w3-opacity,.w3-hover-opacity:hover{opacity:0.60}.w3-opacity-off,.w3-hover-opacity-off:hover{opacity:1}

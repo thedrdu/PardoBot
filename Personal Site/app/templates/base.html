@@ -4,14 +4,15 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/w3.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-  <nav class="navbar navbar-dark navbar-expand-lg bg-black">
+<!--
+  <nav class="navbar fixed-top navbar-dark navbar-expand-lg bg-black" style="--bs-navbar-padding-y: none;">
     <div class="container-fluid" style="font-family: 'LEMONMILK';">
       <a class="navbar-brand" href="#" style="color: white;">PardoBot</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation" style="outline: none;">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse text-right" id="navbarTogglerDemo02">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <ul class="navbar-nav ml-auto mb-2 mb-lg-0">
           <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="/#">Home</a>
           </li>
@@ -22,13 +23,16 @@
             <a class="nav-link" href="/support">Support</a>
           </li>
         </ul>
-        <!-- <form class="d-flex" role="search">
+        
+        <form class="d-flex" role="search">
           <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
           <button class="btn btn-outline-success" type="submit">Search</button>
         </form>
-        -->
+
       </div>
     </div>
   </nav>
-    {% block content %}{% endblock %}
+-->
+  <div style="padding-bottom: 50px"></div>
+  {% block content %}{% endblock %}
 </html>
