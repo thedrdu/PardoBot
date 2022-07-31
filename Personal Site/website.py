@@ -1,0 +1,1 @@
+from app._init_ import app
