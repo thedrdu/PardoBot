@@ -25,13 +25,28 @@ html {
     background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255,255,255, 1.0)' stroke-width='0' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
 }
 
+.zoomin {
+  animation:grow 2.5s 1;
+
+}
+
+@keyframes grow {
+    0% {
+    transform: scale( 0 );-moz-transform: scale( 0 );-o-transform: scale( 0 );-ms-transform: scale( 0 );transform: scale( 0 );
+    }
+
+    100% {
+    transform: scale( 1 );-moz-transform: scale( 1 );-o-transform: scale( 1 );-ms-transform: scale( 1 );transform: scale( 1 );
+    }
+}
+
 
 .backgroundColorShift {
     height: 100px;
     background-color: #c5a599;
     animation-name: backgroundColorShift; 
     animation-delay: 0s;  
-    animation-duration: 2s; 
+    animation-duration: 1.5s; 
     animation-fill-mode: forwards;
 }
 
