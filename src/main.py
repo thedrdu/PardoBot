@@ -36,7 +36,7 @@ async def on_ready():
     await bot.change_presence(status=disnake.Status.streaming, activity=game)
     
 bot.load_extension("cogs.util")
-bot.load_extension("cogs.genshin")
+# bot.load_extension("cogs.genshin")
 # bot.load_extension("cogs.moderation")
 bot.load_extension("cogs.blackjack")
 bot.load_extension("cogs.economy")
