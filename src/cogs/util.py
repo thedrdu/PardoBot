@@ -68,22 +68,16 @@ class UtilCommand(commands.Cog):
             guild_channels = get_news_guilds()
             for guild_id in guild_channels.keys():
                 guild = await self.bot.fetch_guild(guild_id)
-                print(guild.name)
                 channel = await self.bot.fetch_channel(guild_channels[guild_id])
-                # print(channel.name)
                 await channel.send(content=f"<:Pardofelis_Icon:1000849934343491695>Meow! A new tweet from <:AI_Chan_Icon:1001125788189470831>Ai-Chan has arrived!\n\n https://twitter.com/{twt_username}/status/{tweet_id}")
-        # print("tweet found")
         video_id = get_latest_video()
         if check_video_id(video_id) is None:
             add_video_id(video_id)
             guild_channels = get_news_guilds()
             for guild_id in guild_channels.keys():
                 guild = await self.bot.fetch_guild(guild_id)
-                print(guild.name)
                 channel = await self.bot.fetch_channel(guild_channels[guild_id])
-                # print(channel.name)
                 await channel.send(content=f"<:Pardofelis_Icon:1000849934343491695>Meow! A new video from <:AI_Chan_Icon:1001125788189470831>Ai-Chan has arrived!\n\n https://www.youtube.com/watch?v={video_id}")
-        # print("video found")
         
     @tasks.loop(seconds=60.0)
     async def reminder_check(self):
@@ -120,10 +114,10 @@ class UtilCommand(commands.Cog):
     #     await inter.response.send_message(content=f"https://www.youtube.com/watch?v={video_id}")
     
     @commands.slash_command(
-        name="statsconfig",
+        name="configstats",
         description="Configure user HoYoLAB profile on PardoBot.",
     )
-    async def statsconfig(self, inter: disnake.ApplicationCommandInteraction, ltuid: int, ltoken: str, honkai_uid: int):
+    async def configstats(self, inter: disnake.ApplicationCommandInteraction, ltuid: int, ltoken: str, honkai_uid: int):
         set_honkai_user_info(inter.author.id,ltuid,ltoken,honkai_uid)
         await inter.response.send_message(content=f"Successfully set user info!",ephemeral=True)
     
@@ -204,7 +198,6 @@ class UtilCommand(commands.Cog):
         embed.set_thumbnail(url=gis.results()[0].url)
         embed.set_footer(text=f"Data obtained from Honkai Impact 3 Wikia and Google Images in {round(inter.bot.latency * 1000)}ms")
         await inter.edit_original_message(embed=embed,components=page_button)
-    
     
     @commands.slash_command(
         name="remindme",
@@ -295,7 +288,6 @@ class UtilCommand(commands.Cog):
         embed.set_author(name=user, icon_url=user.display_avatar.url)
         embed.set_thumbnail(user.avatar)
         embed.set_footer(text=f"Data retrieved in {round(inter.bot.latency * 1000)}ms | Information requested by {inter.author}")
-        
         
         booster_ids = [booster.id for booster in inter.guild.premium_subscribers]
         if user.id in booster_ids:
