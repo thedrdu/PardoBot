@@ -51,7 +51,6 @@ class MusicCommand(commands.Cog):
             source = await disnake.FFmpegOpusAudio.from_probe(source_url,**FFMPEG_OPTIONS)
         
         voice_client.play(source)
-        
         await inter.edit_original_message(content=f"Now playing in {inter.author.voice.channel.mention}: {url}")
         
     @commands.slash_command(
