@@ -10,6 +10,7 @@ from data.general_util import set_reminder, get_reminder, create_poll, insert_op
 from data.general_util import get_user_description, set_user_description
 from data.general_util import set_honkai_user_info, get_honkai_user_info
 from data.general_util import check_video_id, add_video_id, check_tweet_id, add_tweet_id
+from data.general_util import update_news_guild, remove_news_guild, get_news_guilds
 GCS_DEVELOPER_KEY = os.getenv('GCS_DEVELOPER_KEY')
 GCS_CX = os.getenv('GCS_CX')
 TWT_API_KEY = os.getenv('TWT_API_KEY')
@@ -64,24 +65,25 @@ class UtilCommand(commands.Cog):
         tweet_id = get_latest_tweet()
         if check_tweet_id(tweet_id) is None:
             add_tweet_id(tweet_id)
-            #for channel in channels:
-            guild = await self.bot.fetch_guild(992494783220154429)
-            print(guild.name)
-            channel = await self.bot.fetch_channel(1001115515168751687)
-            print(channel.name)
-            await channel.send(content=f"<:Pardofelis_Icon:1000849934343491695>Meow! A new tweet from <:AI_Chan_Icon:1001125788189470831>Ai-Chan has arrived!\n\n https://twitter.com/{twt_username}/status/{tweet_id}")
-        print("tweet found")
+            guild_channels = get_news_guilds()
+            for guild_id in guild_channels.keys():
+                guild = await self.bot.fetch_guild(guild_id)
+                print(guild.name)
+                channel = await self.bot.fetch_channel(guild_channels[guild_id])
+                # print(channel.name)
+                await channel.send(content=f"<:Pardofelis_Icon:1000849934343491695>Meow! A new tweet from <:AI_Chan_Icon:1001125788189470831>Ai-Chan has arrived!\n\n https://twitter.com/{twt_username}/status/{tweet_id}")
+        # print("tweet found")
         video_id = get_latest_video()
         if check_video_id(video_id) is None:
             add_video_id(video_id)
-            #for channel in channels:
-            guild = await self.bot.fetch_guild(992494783220154429)
-            print(guild.name)
-            channel = await self.bot.fetch_channel(1001115515168751687)
-            print(channel.name)
-            await channel.send(content=f"<:Pardofelis_Icon:1000849934343491695>Meow! A new video from <:AI_Chan_Icon:1001125788189470831>Ai-Chan has arrived!\n\n https://www.youtube.com/watch?v={video_id}")
-            #send the video to all relevant channels
-        print("video found")
+            guild_channels = get_news_guilds()
+            for guild_id in guild_channels.keys():
+                guild = await self.bot.fetch_guild(guild_id)
+                print(guild.name)
+                channel = await self.bot.fetch_channel(guild_channels[guild_id])
+                # print(channel.name)
+                await channel.send(content=f"<:Pardofelis_Icon:1000849934343491695>Meow! A new video from <:AI_Chan_Icon:1001125788189470831>Ai-Chan has arrived!\n\n https://www.youtube.com/watch?v={video_id}")
+        # print("video found")
         
     @tasks.loop(seconds=60.0)
     async def reminder_check(self):
@@ -325,6 +327,28 @@ class UtilCommand(commands.Cog):
         await inter.response.defer()
         await inter.send(content=f"Attempting to delete {amount} messages...", ephemeral=True)
         await inter.channel.purge(limit=amount+1)
+        
+    @commands.slash_command(
+        name="confignews",
+        description="Configure the server's Honkai Impact 3rd news channel.",
+        guild_only=True,
+        default_member_permissions=disnake.Permissions(administrator=True),
+    )
+    async def confignews(self, inter: disnake.ApplicationCommandInteraction, channel: disnake.TextChannel):
+        update_news_guild(inter.guild.id, channel.id)
+        await inter.response.send_message(content=f"Updated {inter.guild.name} to receive updates in {channel.mention}.", ephemeral=True)
+        
+    @commands.slash_command(
+        name="resetconfignews",
+        description="Reset the server's Honkai Impact 3rd news channel.",
+        guild_only=True,
+        default_member_permissions=disnake.Permissions(administrator=True),
+    )
+    async def resetconfignews(self, inter: disnake.ApplicationCommandInteraction):
+        if remove_news_guild(inter.guild.id) is None:
+            await inter.response.send_message(content="No Honkai Impact 3rd news channel has been configured yet!", ephemeral=True)
+        else:
+            await inter.response.send_message(content=f"Removed Honkai Impact 3rd news channel from {inter.guild.name}.", ephemeral=True)
         
     @commands.slash_command(
         name="help",

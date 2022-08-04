@@ -95,9 +95,14 @@ cur = con.cursor()
 #             (ID INTEGER PRIMARY KEY,
 #             VIDEO_ID TEXT NOT NULL UNIQUE);''')
 
-cur.execute('''CREATE TABLE latest_tweets
+# cur.execute('''CREATE TABLE latest_tweets
+#             (ID INTEGER PRIMARY KEY,
+#             TWEET_ID TEXT NOT NULL UNIQUE);''')
+
+cur.execute('''CREATE TABLE news_guilds
             (ID INTEGER PRIMARY KEY,
-            TWEET_ID TEXT NOT NULL UNIQUE);''')
+            GUILD_ID INTEGER NOT NULL UNIQUE,
+            CHANNEL_ID INTEGER NOT NULL);''')
 
 con.commit()
 con.close()

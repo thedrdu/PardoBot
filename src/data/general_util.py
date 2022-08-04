@@ -170,3 +170,47 @@ def add_tweet_id(tweet_id: str):
     cur.execute(f'''INSERT INTO latest_tweets (TWEET_ID) VALUES ("{tweet_id}");''').fetchone()
     con.commit()
     con.close()
+    
+def get_news_guilds():
+    data = {}
+    con = sqlite3.connect(f"{DB_PATH}")
+    cur = con.cursor()
+    rows = cur.execute(f'''SELECT GUILD_ID,CHANNEL_ID FROM news_guilds;''')
+    if rows is None:
+        return None
+    for row in rows:
+        data[row[0]] = row[1]
+    con.commit()
+    con.close()
+    return data
+
+def check_news_guild(guild_id: int):
+    con = sqlite3.connect(f"{DB_PATH}")
+    cur = con.cursor()
+    row = cur.execute(f'''SELECT GUILD_ID FROM news_guilds WHERE GUILD_ID={guild_id};''').fetchone()
+    if row is None:
+        return None
+    con.commit()
+    con.close()
+    return row[0]
+
+def update_news_guild(guild_id: int, channel_id: int):
+    con = sqlite3.connect(f"{DB_PATH}")
+    cur = con.cursor()
+    if check_news_guild(guild_id) is None:
+        cur.execute(f'''INSERT INTO news_guilds (GUILD_ID,CHANNEL_ID) VALUES ({guild_id},{channel_id});''')
+    else:
+        cur.execute(f'''UPDATE news_guilds SET CHANNEL_ID={channel_id} WHERE GUILD_ID={guild_id};''')
+    con.commit()
+    con.close()
+
+def remove_news_guild(guild_id: int):
+    con = sqlite3.connect(f"{DB_PATH}")
+    cur = con.cursor()
+    if check_news_guild(guild_id) is None:
+        return None
+    else:
+        cur.execute(f'''DELETE FROM news_guilds WHERE GUILD_ID={guild_id};''')
+    con.commit()
+    con.close()
+    return guild_id
