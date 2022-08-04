@@ -5,9 +5,6 @@ import os, io, aiohttp, asyncio, itertools
 import google_auth_oauthlib.flow, googleapiclient.discovery, googleapiclient.errors
 from disnake.ext import commands, tasks
 from dotenv import load_dotenv
-from datetime import datetime, timedelta, timezone
-from data.general_util import set_reminder, get_reminder, create_poll, insert_option, remove_vote, add_vote, get_options, get_votes
-from data.general_util import get_user_description, set_user_description
 from data.general_util import set_honkai_user_info, get_honkai_user_info
 from data.general_util import check_video_id, add_video_id, check_tweet_id, add_tweet_id
 from data.general_util import update_news_guild, remove_news_guild, get_news_guilds
