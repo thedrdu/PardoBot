@@ -43,7 +43,7 @@ bot.load_extension("cogs.blackjack")
 bot.load_extension("cogs.economy")
 bot.load_extension("cogs.roulette")
 bot.load_extension("cogs.rps")
-bot.load_extension("cogs.music")
+# bot.load_extension("cogs.music")
 
 '''Passive Commands'''
 # @bot.listen()

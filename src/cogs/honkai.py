@@ -63,7 +63,7 @@ class HonkaiCommand(commands.Cog):
             for guild_id in guild_channels.keys():
                 # guild = await self.bot.fetch_guild(guild_id)
                 channel = await self.bot.fetch_channel(guild_channels[guild_id])
-                await channel.send(content=f"<:Pardofelis_Icon:1000849934343491695>Meow! A new tweet from <:AI_Chan_Icon:1001125788189470831>Ai-Chan has arrived!\n\n https://twitter.com/{twt_username}/status/{tweet_id}")
+                await channel.send(content=f"<:Pardofelis_Icon:1000849934343491695>Meow! A new tweet from <:AI_Chan_Icon:1001125788189470831>Ai-Chan has arrived!\nhttps://twitter.com/{twt_username}/status/{tweet_id}")
         video_id = get_latest_video()
         if check_video_id(video_id) is None:
             add_video_id(video_id)
@@ -71,7 +71,7 @@ class HonkaiCommand(commands.Cog):
             for guild_id in guild_channels.keys():
                 # guild = await self.bot.fetch_guild(guild_id)
                 channel = await self.bot.fetch_channel(guild_channels[guild_id])
-                await channel.send(content=f"<:Pardofelis_Icon:1000849934343491695>Meow! A new video from <:AI_Chan_Icon:1001125788189470831>Ai-Chan has arrived!\n\n https://www.youtube.com/watch?v={video_id}")
+                await channel.send(content=f"<:Pardofelis_Icon:1000849934343491695>Meow! A new video from <:AI_Chan_Icon:1001125788189470831>Ai-Chan has arrived!\nhttps://www.youtube.com/watch?v={video_id}")
         
     @commands.slash_command(
         name="latesttweet",
@@ -91,7 +91,7 @@ class HonkaiCommand(commands.Cog):
     
     @commands.slash_command(
         name="configstats",
-        description="Configure user HoYoLAB profile on PardoBot.",
+        description="Configure user HoYoLAB profile on PardoBot. Type carefully!",
     )
     async def configstats(self, inter: disnake.ApplicationCommandInteraction, ltuid: int, ltoken: str, honkai_uid: int):
         set_honkai_user_info(inter.author.id,ltuid,ltoken,honkai_uid)
@@ -182,8 +182,17 @@ class HonkaiCommand(commands.Cog):
         default_member_permissions=disnake.Permissions(administrator=True),
     )
     async def confignews(self, inter: disnake.ApplicationCommandInteraction, channel: disnake.TextChannel):
-        update_news_guild(inter.guild.id, channel.id)
-        await inter.response.send_message(content=f"Updated {inter.guild.name} to receive updates in {channel.mention}.", ephemeral=True)
+        try:
+            embed = disnake.Embed(
+                title=f"Honkai Impact 3rd News Updates",
+                description=f"{channel.mention} successfully configured to receive Honkai Impact 3rd news updates!"
+            )
+            await channel.send(embed=embed)
+        except disnake.Forbidden:
+            await inter.response.send_message(content=f"PardoBot does not have permission to send messages to {channel.mention}!", ephemeral=True)
+        else:
+            update_news_guild(inter.guild.id, channel.id)
+            await inter.response.send_message(content=f"Updated {inter.guild.name} to receive updates in {channel.mention}.", ephemeral=True)
         
     @commands.slash_command(
         name="resetconfignews",
