@@ -195,12 +195,12 @@ class HonkaiCommand(commands.Cog):
             await inter.response.send_message(content=f"Updated {inter.guild.name} to receive updates in {channel.mention}.", ephemeral=True)
         
     @commands.slash_command(
-        name="resetconfignews",
+        name="resetnews",
         description="Reset the server's Honkai Impact 3rd news channel.",
         guild_only=True,
         default_member_permissions=disnake.Permissions(administrator=True),
     )
-    async def resetconfignews(self, inter: disnake.ApplicationCommandInteraction):
+    async def resetnews(self, inter: disnake.ApplicationCommandInteraction):
         if remove_news_guild(inter.guild.id) is None:
             await inter.response.send_message(content="No Honkai Impact 3rd news channel has been configured yet!", ephemeral=True)
         else:
