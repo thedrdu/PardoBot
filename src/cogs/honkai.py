@@ -72,7 +72,7 @@ class HonkaiCommand(commands.Cog):
                 # guild = await self.bot.fetch_guild(guild_id)
                 channel = await self.bot.fetch_channel(guild_channels[guild_id])
                 await channel.send(content=f"<:Pardofelis_Icon:1000849934343491695>Meow! A new video from <:AI_Chan_Icon:1001125788189470831>Ai-Chan has arrived!\nhttps://www.youtube.com/watch?v={video_id}")
-        
+
     @commands.slash_command(
         name="latesttweet",
         description="Returns the latest tweet from the official HI3 Twitter account."
