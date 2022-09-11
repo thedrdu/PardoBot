@@ -61,16 +61,20 @@ class HonkaiCommand(commands.Cog):
             add_tweet_id(tweet_id)
             guild_channels = get_news_guilds()
             for guild_id in guild_channels.keys():
-                # guild = await self.bot.fetch_guild(guild_id)
-                channel = await self.bot.fetch_channel(guild_channels[guild_id])
+                try:
+                    channel = await self.bot.fetch_channel(guild_channels[guild_id])
+                except:
+                    remove_news_guild(guild_id)
                 await channel.send(content=f"<:Pardofelis_Icon:1000849934343491695>Meow! A new tweet from <:AI_Chan_Icon:1001125788189470831>Ai-Chan has arrived!\nhttps://twitter.com/{twt_username}/status/{tweet_id}")
         video_id = get_latest_video()
         if check_video_id(video_id) is None:
             add_video_id(video_id)
             guild_channels = get_news_guilds()
             for guild_id in guild_channels.keys():
-                # guild = await self.bot.fetch_guild(guild_id)
-                channel = await self.bot.fetch_channel(guild_channels[guild_id])
+                try:
+                    channel = await self.bot.fetch_channel(guild_channels[guild_id])
+                except:
+                    remove_news_guild(guild_id)
                 await channel.send(content=f"<:Pardofelis_Icon:1000849934343491695>Meow! A new video from <:AI_Chan_Icon:1001125788189470831>Ai-Chan has arrived!\nhttps://www.youtube.com/watch?v={video_id}")
 
     @commands.slash_command(

@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from disnake.ext.commands import guild_only
 from dotenv import load_dotenv
 from isort import file, stream
+from data.general_util import remove_news_guild
 load_dotenv()
 TOKEN = os.getenv('BOT_TOKEN')
 
@@ -16,6 +17,7 @@ intents.messages = True
 intents.message_content = True
 intents.emojis = True
 intents.emojis_and_stickers = True
+intents.guilds = True
 
 bot = commands.Bot(
     sync_commands_debug=False,
@@ -35,10 +37,16 @@ async def on_ready():
     await online()
     await bot.change_presence(status=disnake.Status.streaming, activity=game)
     
+@bot.event
+async def on_guild_join(guild: disnake.Guild):
+    await guild.system_channel.send(content=f"Thank you for inviting PardoBot to {guild.name}!\n\nFor information on how to use her, visit (insert url later)")
+
+@bot.event
+async def on_guild_remove(guild: disnake.Guild):
+    remove_news_guild(guild.id)
+
 bot.load_extension("cogs.util")
 bot.load_extension("cogs.honkai")
-# bot.load_extension("cogs.genshin")
-# bot.load_extension("cogs.moderation")
 bot.load_extension("cogs.blackjack")
 bot.load_extension("cogs.economy")
 bot.load_extension("cogs.roulette")

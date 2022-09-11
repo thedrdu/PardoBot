@@ -7,6 +7,7 @@ import os
 import asyncio
 from dotenv import load_dotenv
 from datetime import datetime, timezone
+load_dotenv()
 DB_PATH = os.getenv('DB_PATH')
 
 STARTER_BALANCE = 1000
@@ -32,7 +33,7 @@ def get_reminder():
     con.commit()
     con.close()
     return reminders, creation_times
-    
+
 
 '''Polls'''
 def create_poll(title: str):
@@ -207,6 +208,7 @@ def update_news_guild(guild_id: int, channel_id: int):
 def remove_news_guild(guild_id: int):
     con = sqlite3.connect(f"{DB_PATH}")
     cur = con.cursor()
+    print(f"leaving {guild_id}")
     if check_news_guild(guild_id) is None:
         return None
     else:
