@@ -3,4 +3,4 @@
 
 Coded in python3.10.4 using the disnake library.
 
-pardobot.com
+[pardobot.com](http://pardobot.com)
