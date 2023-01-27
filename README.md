@@ -1,6 +1,9 @@
 # PardoBot
 ### A fullstack Discord Bot for fun and utility!
 
+
+- REWORK CURRENTLY IN DEVELOPMENT -
+
 Coded in python3.10.4 using the disnake library.
 
 [pardobot.com](http://pardobot.com) [^1]
